@@ -55,6 +55,9 @@ class Kona < Racc::Parser
         when (text = ss.scan(/[\ \t\n]/))
           ;
 
+        when (text = ss.scan(/\/\/.*$/))
+          ;
+
         when (text = ss.scan(/[a-zA-Z_][a-zA-Z0-9_]*/))
            @rex_tokens.push action {[:TIDENTIFIER, text]}
 

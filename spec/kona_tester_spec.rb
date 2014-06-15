@@ -2,5 +2,4 @@ require './parser.rb'
 
 @evaluator = Kona.new
 
-puts @evaluator.scan_str("{x=3+4
-                          x=x+2}")
+puts @evaluator.parse(File.open(ARGV[0]).read) if ARGV[0]

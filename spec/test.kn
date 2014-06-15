@@ -1,0 +1,9 @@
+x=3
+x = x+1
+// this is acomment
+test(var, val)
+{
+  var = var + val
+}
+
+test(2)

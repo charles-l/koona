@@ -4,6 +4,7 @@ macro
   BLANK [\ \t\n]
 rule
   {BLANK} # nothing
+  \/\/.*$  # comment
   [a-zA-Z_][a-zA-Z0-9_]*  {[:TIDENTIFIER, text]}
   [0-9]+\.[0-9]*          {[:TFLOAT, text.to_f]}
   [0-9]+                  {[:TINTEGER, text.to_i]}

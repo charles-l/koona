@@ -6,17 +6,31 @@ class Kona
 
   start program
 rule
-  program : stmts {programBlock = val[0]}
-  stmts : stmt {result = NBlock.new} | stmts stmt
-  stmt : var_decl | expr | block
-  block : TLBRACE stmts TRBRACE {result = val[1]}
-  var_decl : ident TEQUAL expr {}
-  ident : TIDENTIFIER
-  numeric : TINTEGER | TDOUBLE
-  expr : ident TEQUAL expr
+  program : stmts {programBlock = [val[0]]}
+  stmts : stmt {result = []; result << val[0]} 
+        | stmts stmt {val[0] << val[1]}
+  stmt : expr {result = NExpressionStatement.new(val[0])}
+       | block 
+       | func_decl
+  block : TLBRACE TRBRACE {result = NBlock.new}
+        | TLBRACE stmts TRBRACE {result = val[1]}
+  func_decl : ident TLPAREN func_decl_args TRPAREN block 
+            { result = NFunctionDeclaration.new(val[0], val[2], val[4])}
+  func_decl_args : {result = VariableList.new}
+                 | ident {result = VariableList.new; result.variables << val[0]}
+                 | func_decl_args TCOMMA ident {val[0].variables << val[2]}
+  ident : TIDENTIFIER {result = NIdentifier.new(val[0])}
+  numeric : TINTEGER {result = NInteger.new(val[0])}
+          | TDOUBLE {result = NDouble.new(val[0])}
+  expr : ident TEQUAL expr {result = NAssignment.new(val[0], val[2])}
+       | ident TLPAREN call_args TRPAREN {result = NMethodCall.new(val[0], val[2])}
+       | ident {result = val[0]}
        | numeric
-       | ident
-       | expr comparison expr
+       | expr comparison expr {result = NBinaryOperator.new(val[0], val[1], val[2])}
+       | TLPAREN expr TRPAREN {result = val[1]}
+  call_args : {result = ExpressionList.new}
+            | expr {result = ExpressionList.new; result.expressions << val[0]}
+            | call_args TCOMMA expr {val[0].variables << val[2]}
   comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE 
              | TPLUS | TMINUS | TMUL | TDIV
 end
