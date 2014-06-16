@@ -8,15 +8,19 @@ require 'racc/parser.rb'
 
   require './node.rb'
   require './lexer.rb'
+  require './node.rb'
   programBlock = NBlock.new
 
-class Kona < Racc::Parser
+class Koona < Racc::Parser
 
-module_eval(<<'...end kona.y/module_eval...', 'kona.y', 44)
+module_eval(<<'...end koona.y/module_eval...', 'koona.y', 45)
   def parse(input)
-    scan_str(input)
+    do_parse
   end
-...end kona.y/module_eval...
+  def on_error(tok, val, vstack)
+    $stderr.puts "Parse error on value: \"#{val.to_s}\"", "Stack: #{vstack.inspect}"
+  end
+...end koona.y/module_eval...
 ##### State transition tables begin ###
 
 racc_action_table = [
@@ -62,10 +66,10 @@ racc_action_pointer = [
 
 racc_action_default = [
    -35,   -35,   -35,   -13,    -1,   -15,   -35,    -2,   -14,    -4,
-    -5,    -6,   -18,   -19,   -35,   -18,   -35,    -3,   -35,    -7,
+    -5,    -6,   -18,   -17,   -35,   -18,   -35,    -3,   -35,    -7,
    -35,   -25,   -26,   -31,   -27,   -32,   -28,   -33,   -29,   -34,
    -30,   -35,   -10,   -21,   -22,    50,    -8,   -20,   -16,   -23,
-   -18,   -35,   -35,   -35,   -35,   -17,   -35,    -9,   -12,   -24 ]
+   -18,   -35,   -35,   -35,   -35,   -19,   -35,    -9,   -12,   -24 ]
 
 racc_goto_table = [
     14,    17,    12,     4,     2,    47,    12,    41,    12,    18,
@@ -94,7 +98,7 @@ racc_reduce_table = [
   1, 23, :_reduce_1,
   1, 24, :_reduce_2,
   2, 24, :_reduce_3,
-  1, 25, :_reduce_4,
+  1, 25, :_reduce_none,
   1, 25, :_reduce_none,
   1, 25, :_reduce_none,
   2, 27, :_reduce_7,
@@ -107,9 +111,9 @@ racc_reduce_table = [
   1, 31, :_reduce_14,
   1, 31, :_reduce_15,
   3, 26, :_reduce_16,
-  4, 26, :_reduce_17,
-  1, 26, :_reduce_18,
   1, 26, :_reduce_none,
+  1, 26, :_reduce_none,
+  4, 26, :_reduce_19,
   3, 26, :_reduce_20,
   3, 26, :_reduce_21,
   0, 32, :_reduce_22,
@@ -216,153 +220,143 @@ Racc_debug_parser = false
 
 # reduce 0 omitted
 
-module_eval(<<'.,.,', 'kona.y', 8)
+module_eval(<<'.,.,', 'koona.y', 8)
   def _reduce_1(val, _values, result)
-    programBlock = val[0]
+    programBlock = NBlock.new
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 9)
+module_eval(<<'.,.,', 'koona.y', 9)
   def _reduce_2(val, _values, result)
     result = NBlock.new; result.statements << val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 10)
+module_eval(<<'.,.,', 'koona.y', 10)
   def _reduce_3(val, _values, result)
     val[0].statements << val[1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 11)
-  def _reduce_4(val, _values, result)
-    result = NExpressionStatement.new(val[0])
-    result
-  end
-.,.,
+# reduce 4 omitted
 
 # reduce 5 omitted
 
 # reduce 6 omitted
 
-module_eval(<<'.,.,', 'kona.y', 14)
+module_eval(<<'.,.,', 'koona.y', 14)
   def _reduce_7(val, _values, result)
     result = NBlock.new
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 15)
+module_eval(<<'.,.,', 'koona.y', 15)
   def _reduce_8(val, _values, result)
-    result = val[1]
+    result = NBlock.new; result.statements << val[1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 17)
+module_eval(<<'.,.,', 'koona.y', 17)
   def _reduce_9(val, _values, result)
      result = NFunctionDeclaration.new(val[0], val[2], val[4])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 18)
+module_eval(<<'.,.,', 'koona.y', 18)
   def _reduce_10(val, _values, result)
-    result = VariableList.new
+    VariableList.new([])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 19)
+module_eval(<<'.,.,', 'koona.y', 19)
   def _reduce_11(val, _values, result)
     result = VariableList.new; result.variables << val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 20)
+module_eval(<<'.,.,', 'koona.y', 20)
   def _reduce_12(val, _values, result)
     val[0].variables << val[2]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 21)
+module_eval(<<'.,.,', 'koona.y', 21)
   def _reduce_13(val, _values, result)
     result = NIdentifier.new(val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 22)
+module_eval(<<'.,.,', 'koona.y', 22)
   def _reduce_14(val, _values, result)
     result = NInteger.new(val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 23)
+module_eval(<<'.,.,', 'koona.y', 23)
   def _reduce_15(val, _values, result)
-    result = NDouble.new(val[0])
+    result = NFloat.new(val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 24)
+module_eval(<<'.,.,', 'koona.y', 24)
   def _reduce_16(val, _values, result)
-    result = NAssignment.new(val[0], val[2])
+    result = NVariableDeclaration.new(val[0], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 25)
-  def _reduce_17(val, _values, result)
-    result = NMethodCall.new(val[0], val[2])
+# reduce 17 omitted
+
+# reduce 18 omitted
+
+module_eval(<<'.,.,', 'koona.y', 27)
+  def _reduce_19(val, _values, result)
+    result = NFunctionCall.new(val[0], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 26)
-  def _reduce_18(val, _values, result)
-    result = val[0]
-    result
-  end
-.,.,
-
-# reduce 19 omitted
-
-module_eval(<<'.,.,', 'kona.y', 28)
+module_eval(<<'.,.,', 'koona.y', 28)
   def _reduce_20(val, _values, result)
     result = NBinaryOperator.new(val[0], val[1], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 29)
+module_eval(<<'.,.,', 'koona.y', 29)
   def _reduce_21(val, _values, result)
     result = val[1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 30)
+module_eval(<<'.,.,', 'koona.y', 30)
   def _reduce_22(val, _values, result)
-    result = ExpressionList.new
+    result = VariableList.new
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 31)
+module_eval(<<'.,.,', 'koona.y', 31)
   def _reduce_23(val, _values, result)
-    result = ExpressionList.new; result.expressions << val[0]
+    result = VariableList.new; result.variables << val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'kona.y', 32)
+module_eval(<<'.,.,', 'koona.y', 32)
   def _reduce_24(val, _values, result)
     val[0].variables << val[2]
     result
@@ -393,4 +387,4 @@ def _reduce_none(val, _values, result)
   val[0]
 end
 
-end   # class Kona
+end   # class Koona

@@ -6,4 +6,6 @@ test(var, val)
   var = var + val
 }
 
-test(2)
+test((x), 2)
+
+x=1

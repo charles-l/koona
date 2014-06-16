@@ -1,4 +1,4 @@
-class Kona
+class Koona
 
 macro
   BLANK [\ \t\n]
@@ -26,13 +26,4 @@ rule
   \*                    {[:TMUL, text]}
   \/                     {[:TDIV, text]}
   .                       { return "Unexpected character!"}
-inner
-  def tokenize(code)
-    scan_setup(code)
-    tokens = []
-    while token = next_token
-      tokens << token
-    end
-    tokens
-  end
 end

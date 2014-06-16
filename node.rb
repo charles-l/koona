@@ -1,16 +1,21 @@
-class Node
+class NExpression
 end
 
-class NExpression < Node
-end
-
-class NStatement < Node
+class NStatement
 end
 
 class NIdentifier < NExpression
   attr_accessor :name
   def initialize(name)
     self.name = name
+  end
+  
+  def generate
+    return "#{self.name}"
+  end
+
+  def to_s
+    generate
   end
 end
 
@@ -19,12 +24,27 @@ class NBlock < NExpression
   def initialize()
     self.statements = []
   end
+  def generate()
+    return "
+{
+#{statements}
+}"
+  end
+  def to_s()
+    generate
+  end
 end
 
 class NInteger < NExpression
   attr_accessor :value
   def initialize(value)
     self.value = value
+  end
+  def generate
+    return "#{self.value}"
+  end
+  def to_s
+    generate
   end
 end
 
@@ -52,6 +72,47 @@ class NBinaryOperator < NExpression
     self.lhs = lhs
     self.op = op
     self.rhs = rhs
+  end
+
+  def generate
+    return "#{self.lhs} #{self.op} #{self.rhs}"
+  end
+
+  def to_s
+    generate
+  end
+end
+
+class NVariableDeclaration < NExpression
+  attr_accessor :id
+  attr_accessor :expr
+  def initialize(id, expr)
+    self.id = id
+    self.expr = expr
+  end
+  
+  def generate()
+    return "int #{self.id} = #{self.expr};\n"
+  end
+
+  def to_s
+    generate
+  end
+end
+
+class NFunctionCall < NExpression
+  attr_accessor :id
+  attr_accessor :arguments
+  def initialize(id, arguments)
+    self.id = id
+    self.arguments = arguments
+  end
+  
+  def generate
+    return "#{id}(#{arguments});\n"
+  end
+  def to_s
+    generate
   end
 end
 
@@ -87,11 +148,11 @@ class VariableList
   def initialize()
     self.variables = []
   end
-end
 
-class ExpressionList
-  attr_accessor :expressions
-  def initialize()
-    self.expressions = []
+  def generate
+    return "#{self.variables.join(",")}"
+  end
+  def to_s
+    generate
   end
 end
