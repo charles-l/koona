@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+require './lib/parser.rb'
+require './lib/generator.rb'
+
+@evaluator = Koona.new
+@generator = Generator.new
+
+if ARGV[0]
+  File.open("#{ARGV[0].gsub('.kn', '.c')}", 'w') do |f|
+    f.puts @generator.generate(@evaluator.scan_file(ARGV[0]))
+  end
+else
+  abort("Requires input file...")
+end

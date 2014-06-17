@@ -1,0 +1,11 @@
+int x=3
+x = x+1
+// this is acomment
+int addVal(int var, int val)
+{
+  return (var + val)
+}
+
+addVal((x), 2)
+
+x=1

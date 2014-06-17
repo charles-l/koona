@@ -25,5 +25,6 @@ rule
   \-                     {[:TMINUS, text]}
   \*                    {[:TMUL, text]}
   \/                     {[:TDIV, text]}
+  return                  {[:TRETURN, text]}
   .                       { return "Unexpected character!"}
 end

@@ -1,4 +1,3 @@
 all:
-	rex koona.rex -o lexer.rb
-	racc koona.y -o parser.rb
-	ruby spec/koona_tester_spec.rb spec/test.kn
+	rex lib/koona.rex -o lib/lexer.rb
+	racc lib/koona.y -o lib/parser.rb

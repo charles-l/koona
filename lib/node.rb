@@ -11,7 +11,7 @@ class NIdentifier < NExpression
   end
   
   def generate
-    return "#{self.name}"
+     "#{self.name}"
   end
 
   def to_s
@@ -21,16 +21,15 @@ end
 
 class NBlock < NExpression
   attr_accessor :statements
-  def initialize()
+  attr_accessor :local_vars
+  def initialize
     self.statements = []
+    self.local_vars = []
   end
-  def generate()
-    return "
-{
-#{statements}
-}"
+  def generate
+     "#{statements}"
   end
-  def to_s()
+  def to_s
     generate
   end
 end
@@ -41,7 +40,7 @@ class NInteger < NExpression
     self.value = value
   end
   def generate
-    return "#{self.value}"
+     "#{self.value}"
   end
   def to_s
     generate
@@ -75,7 +74,7 @@ class NBinaryOperator < NExpression
   end
 
   def generate
-    return "#{self.lhs} #{self.op} #{self.rhs}"
+     "#{self.lhs} #{self.op} #{self.rhs}"
   end
 
   def to_s
@@ -85,18 +84,44 @@ end
 
 class NVariableDeclaration < NExpression
   attr_accessor :id
+  attr_accessor :type
+  attr_accessor :expr
+  def initialize(type, id, expr)
+    self.type = type
+    self.id = id
+    self.expr = expr
+  end
+  
+  def generate
+     "#{self.type} #{self.id} = #{self.expr};\n"
+  end
+
+  def to_s
+    generate
+  end
+end
+
+class NVariableAssignment < NExpression
+  attr_accessor :id
   attr_accessor :expr
   def initialize(id, expr)
     self.id = id
     self.expr = expr
   end
   
-  def generate()
-    return "int #{self.id} = #{self.expr};\n"
+  def generate
+     "#{self.id} = #{self.expr};\n"
   end
 
   def to_s
     generate
+  end
+end
+
+class NReturn < NExpression
+  attr_accessor :expr
+  def initialize(expr)
+    self.expr = expr
   end
 end
 
@@ -109,7 +134,7 @@ class NFunctionCall < NExpression
   end
   
   def generate
-    return "#{id}(#{arguments});\n"
+     "#{id}(#{arguments});\n"
   end
   def to_s
     generate
@@ -124,13 +149,22 @@ class NExpressionStatement < NStatement
 end
 
 class NFunctionDeclaration < NStatement
+  attr_accessor :type
   attr_accessor :id
   attr_accessor :arguments
   attr_accessor :block
-  def initialize(id, arguments, block)
+  def initialize(type, id, arguments, block)
+    self.type = type
     self.id = id
     self.arguments = arguments
     self.block = block
+  end
+
+  def generate
+    "#{self.type} #{self.id} (#{self.arguments})\n{\n#{self.block}}\n"
+  end
+  def to_s
+    return ""
   end
 end
 
@@ -145,13 +179,31 @@ end
 
 class VariableList
   attr_accessor :variables
-  def initialize()
+  def initialize
     self.variables = []
   end
 
   def generate
-    return "#{self.variables.join(",")}"
+     "#{self.variables.join(",")}"
   end
+  def to_s
+    generate
+  end
+end
+
+class FunctionVar < NExpression
+  attr_accessor :type
+  attr_accessor :id
+
+  def initialize(type, id)
+    self.type = type
+    self.id = id
+  end
+
+  def generate
+     "#{self.type} #{self.id}"
+  end
+
   def to_s
     generate
   end
