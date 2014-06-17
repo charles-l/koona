@@ -1,5 +1,6 @@
 # Koona
 ### A *really* simple programming language
+**NOTE: I've been developing in Ruby 1.8 (and it'll probably work in 1.9.x), because racc and rex don't support the latest versions of Ruby**
 
 Koona is a simple programing language I'm writing to learn about compiler design. It's written in Ruby, but I'll eventually port it to more permanent C++ code.
 
