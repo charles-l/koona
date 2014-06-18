@@ -1,4 +1,4 @@
-class Koona::Evaluator
+class Koona::Parser
   token TIDENTIFIER TDOUBLE TINTEGER
   token TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
   token TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
@@ -47,4 +47,12 @@ end
 ---- inner
   def on_error(tok, val, vstack)
     $stderr.puts "Parse error on value: \"#{val.to_s}\"", "Stack: #{vstack.inspect}"
+  end
+  def parse(tokens)
+    @tokens = tokens
+    do_parse
+  end
+
+  def next_token
+    @tokens.shift
   end

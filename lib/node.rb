@@ -1,7 +1,10 @@
-class NExpression
+class Node
 end
 
-class NStatement
+class NExpression < Node
+end
+
+class NStatement < Node
 end
 
 class NIdentifier < NExpression

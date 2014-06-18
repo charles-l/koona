@@ -4,9 +4,8 @@ require './lib/generator.rb'
 require './lib/compiler.rb'
 
 if ARGV[0]
-  compiler = Koona::Compiler.new
   File.open("#{ARGV[0].gsub('.kn', '.c')}", 'w') do |f|
-    f.puts compiler.compile(ARGV[0])
+    f.puts Koona::Compiler.new.compile(ARGV[0])
   end
 else 
   abort("Requires input file...")

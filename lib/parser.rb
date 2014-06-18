@@ -11,11 +11,19 @@ require 'racc/parser.rb'
 
 
 module Koona
-  class Evaluator < Racc::Parser
+  class Parser < Racc::Parser
 
 module_eval(<<'...end koona.y/module_eval...', 'koona.y', 48)
   def on_error(tok, val, vstack)
     $stderr.puts "Parse error on value: \"#{val.to_s}\"", "Stack: #{vstack.inspect}"
+  end
+  def parse(tokens)
+    @tokens = tokens
+    do_parse
+  end
+
+  def next_token
+    @tokens.shift
   end
 ...end koona.y/module_eval...
 ##### State transition tables begin ###
@@ -418,5 +426,5 @@ def _reduce_none(val, _values, result)
   val[0]
 end
 
-  end   # class Evaluator
+  end   # class Parser
   end   # module Koona
