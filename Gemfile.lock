@@ -2,11 +2,9 @@ GEM
   remote: https://rubygems.org/
   specs:
     racc (1.4.11)
-    rex (1.0.2)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   racc
-  rex

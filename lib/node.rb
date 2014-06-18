@@ -10,11 +10,11 @@ end
 class NIdentifier < NExpression
   attr_accessor :name
   def initialize(name)
-    self.name = name
+    @name = name
   end
-  
+
   def generate
-     "#{self.name}"
+    "#{@name}"
   end
 
   def to_s
@@ -26,11 +26,11 @@ class NBlock < NExpression
   attr_accessor :statements
   attr_accessor :local_vars
   def initialize
-    self.statements = []
-    self.local_vars = []
+    @statements = []
+    @local_vars = []
   end
   def generate
-     "#{statements}"
+     "#{@statements.join("")}"
   end
   def to_s
     generate
@@ -40,10 +40,10 @@ end
 class NInteger < NExpression
   attr_accessor :value
   def initialize(value)
-    self.value = value
+    @value = value
   end
   def generate
-     "#{self.value}"
+     "#{@value}"
   end
   def to_s
     generate
@@ -53,7 +53,7 @@ end
 class NDouble < NExpression
   attr_accessor :value
   def initialize(value)
-    self.value = value
+    @value = value
   end
 end
 
@@ -61,8 +61,8 @@ class NMethodCall < NExpression
   attr_accessor :id
   attr_accessor :arguments
   def initialize(id, arguments)
-    self.id = id
-    self.arguments = arguments
+    @id = id
+    @arguments = arguments
   end
 end
 
@@ -71,13 +71,13 @@ class NBinaryOperator < NExpression
   attr_accessor :lhs
   attr_accessor :rhs
   def initialize(lhs, op, rhs)
-    self.lhs = lhs
-    self.op = op
-    self.rhs = rhs
+    @lhs = lhs
+    @op = op
+    @rhs = rhs
   end
 
   def generate
-     "#{self.lhs} #{self.op} #{self.rhs}"
+     "#{@lhs} #{@op} #{@rhs}"
   end
 
   def to_s
@@ -90,13 +90,13 @@ class NVariableDeclaration < NExpression
   attr_accessor :type
   attr_accessor :expr
   def initialize(type, id, expr)
-    self.type = type
-    self.id = id
-    self.expr = expr
+    @type = type
+    @id = id
+    @expr = expr
   end
-  
+
   def generate
-     "#{self.type} #{self.id} = #{self.expr};\n"
+     "#{@type} #{@id} = #{@expr};\n"
   end
 
   def to_s
@@ -108,12 +108,12 @@ class NVariableAssignment < NExpression
   attr_accessor :id
   attr_accessor :expr
   def initialize(id, expr)
-    self.id = id
-    self.expr = expr
+    @id = id
+    @expr = expr
   end
-  
+
   def generate
-     "#{self.id} = #{self.expr};\n"
+    "#{@id} = #{@expr};\n"
   end
 
   def to_s
@@ -124,7 +124,10 @@ end
 class NReturn < NExpression
   attr_accessor :expr
   def initialize(expr)
-    self.expr = expr
+    @expr = expr
+  end
+  def to_s
+    ""
   end
 end
 
@@ -132,10 +135,10 @@ class NFunctionCall < NExpression
   attr_accessor :id
   attr_accessor :arguments
   def initialize(id, arguments)
-    self.id = id
-    self.arguments = arguments
+    @id = id
+    @arguments = arguments
   end
-  
+ 
   def generate
      "#{id}(#{arguments});\n"
   end
@@ -147,7 +150,7 @@ end
 class NExpressionStatement < NStatement
   attr_accessor :expression
   def initialize(expression)
-    self.expression = expression
+    @expression = expression
   end
 end
 
@@ -157,17 +160,17 @@ class NFunctionDeclaration < NStatement
   attr_accessor :arguments
   attr_accessor :block
   def initialize(type, id, arguments, block)
-    self.type = type
-    self.id = id
-    self.arguments = arguments
-    self.block = block
+    @type = type
+    @id = id
+    @arguments = arguments
+    @block = block
   end
 
   def generate
-    "#{self.type} #{self.id} (#{self.arguments})\n{\n#{self.block}}\n"
+    "#{@type} #{@id} (#{@arguments})\n{\n#{@block}}\n"
   end
   def to_s
-    return ""
+    ""
   end
 end
 
@@ -175,19 +178,19 @@ class NAssignment < NStatement
   attr_accessor :id
   attr_accessor :assignmentExpr
   def initialize(id, assignmentExpr)
-    self.id = id
-    self.assignmentExpr = assignmentExpr
+    @id = id
+    @assignmentExpr = assignmentExpr
   end
 end
 
 class VariableList
   attr_accessor :variables
   def initialize
-    self.variables = []
+    @variables = []
   end
 
   def generate
-     "#{self.variables.join(",")}"
+     "#{@variables.join(",")}"
   end
   def to_s
     generate
@@ -199,12 +202,12 @@ class FunctionVar < NExpression
   attr_accessor :id
 
   def initialize(type, id)
-    self.type = type
-    self.id = id
+    @type = type
+    @id = id
   end
 
   def generate
-     "#{self.type} #{self.id}"
+     "#{@type} #{@id}"
   end
 
   def to_s
