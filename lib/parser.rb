@@ -10,7 +10,8 @@ require 'racc/parser.rb'
   require './lib/lexer.rb'
 
 
-class Koona < Racc::Parser
+module Koona
+  class Evaluator < Racc::Parser
 
 module_eval(<<'...end koona.y/module_eval...', 'koona.y', 48)
   def on_error(tok, val, vstack)
@@ -417,4 +418,5 @@ def _reduce_none(val, _values, result)
   val[0]
 end
 
-end   # class Koona
+  end   # class Evaluator
+  end   # module Koona

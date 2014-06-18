@@ -1,4 +1,5 @@
-class Koona
+module Koona
+class Evaluator
 
 macro
   BLANK [\ \t\n]
@@ -27,4 +28,5 @@ rule
   \/                     {[:TDIV, text]}
   return                  {[:TRETURN, text]}
   .                       { return "Unexpected character!"}
+end
 end

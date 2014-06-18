@@ -5,7 +5,8 @@
 #++
 
 require 'racc/parser'
-class Koona < Racc::Parser
+module Koona
+class Evaluator < Racc::Parser
   require 'strscan'
 
   class ScanError < StandardError ; end
@@ -136,3 +137,4 @@ class Koona < Racc::Parser
   end  # def scan_evaluate
 
 end # class
+end
