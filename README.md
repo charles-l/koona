@@ -1,7 +1,5 @@
 # Koona
 ### A *really* simple programming language
-**NOTE: I've been developing in Ruby 1.8. I would recommend using [RVM](https://rvm.io/) so you can easily switch between versions of Ruby.**
-
 Koona is a simple programing language I'm writing to learn about compiler design. It's written in Ruby, but I'll eventually port it to more permanent C++ code.
 
 ## What it does
