@@ -261,7 +261,7 @@ module_eval(<<'.,.,', 'koona.y', 10)
 
 module_eval(<<'.,.,', 'koona.y', 11)
   def _reduce_3(val, _values, result)
-    val[0].statments << val[1]
+    val[0].statements << val[1]
     result
   end
 .,.,
@@ -283,7 +283,7 @@ module_eval(<<'.,.,', 'koona.y', 18)
 
 module_eval(<<'.,.,', 'koona.y', 19)
   def _reduce_9(val, _values, result)
-    result = Koona::AST::NBlock.new << val[1]
+    result = Koona::AST::NBlock.new; result.statements << val[1]
     result
   end
 .,.,

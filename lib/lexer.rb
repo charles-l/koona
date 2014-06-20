@@ -87,7 +87,7 @@ module Koona
             @rex_tokens.push action {[:TCOMMA,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\+/))
-            @rex_tokens.push action {[:TPLUS,Token.new(text, @filename, @lineno)]}
+            @rex_tokens.push action {[:TPLUS, Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\-/))
             @rex_tokens.push action {[:TMINUS,Token.new(text, @filename, @lineno)]}

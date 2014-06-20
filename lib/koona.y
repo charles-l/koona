@@ -9,7 +9,7 @@ class Koona::Parser
 rule
   program : stmts {result = Koona::AST::NBlock.new; result.statements << val[0]}
   stmts : stmt {result = Koona::AST::NBlock.new; result.statements << val[0]}
-        | stmts stmt {val[0].statments << val[1]}
+        | stmts stmt {val[0].statements << val[1]}
 
   stmt : expr
        | block 
@@ -17,7 +17,7 @@ rule
        | var_decl
 
   block : TLBRACE TRBRACE {result = Koona::AST::NBlock.new}
-        | TLBRACE stmts TRBRACE {result = Koona::AST::NBlock.new << val[1]}
+        | TLBRACE stmts TRBRACE {result = Koona::AST::NBlock.new; result.statements << val[1]}
 
   var_decl : ident ident TEQUAL expr {result = Koona::AST::NVariableDeclaration.new(val[0], val[1], val[3], val[0])}
 

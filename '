@@ -16,7 +16,7 @@ module Koona
       attr_accessor :statements
 
       def to_s
-        "{#{@statements.join("\n")}}"
+        "#{@statements.join("\n")}"
       end
     end
 
@@ -101,7 +101,7 @@ module Koona
       attr_accessor :rhs
 
       def to_s
-        "#{@lhs} #{@op.value} #{@rhs}"
+        "#{@lhs} #{@op} #{@rhs}"
       end
     end
 
@@ -117,7 +117,7 @@ module Koona
       attr_accessor :expr
 
       def to_s
-        "#{@type} #{@id} = #{@expr}\n"
+        "#{@type} #{@id} = #{@expr};\n"
       end
     end
 
@@ -131,7 +131,7 @@ module Koona
       attr_accessor :expr
 
       def to_s
-        "#{@id} = #{@expr}\n"
+        "#{@id} = #{@expr};\n"
       end
     end
 
@@ -143,7 +143,7 @@ module Koona
       attr_accessor :expr
 
       def to_s
-        "return #{@expr}\n"
+        "return #{@expr};\n"
       end
     end
 
