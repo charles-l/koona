@@ -3,8 +3,8 @@ module Koona
     def compile(input)
       lexer = Koona::Lexer.new
       parser = Koona::Parser.new
-      ast = parser.parse(lexer.scan_file(input))
-      puts ast
+      generator = Koona::Generator.new
+      puts generator.generate(parser.parse(lexer.scan_file(input)))
     end
   end
 end

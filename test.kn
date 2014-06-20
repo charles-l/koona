@@ -7,5 +7,3 @@ int addVal(int var, int val)
 }
 
 addVal((x), 2)
-
-x=1

@@ -1,6 +1,7 @@
 module Koona
   module AST 
     class Node
+      # Superclass to keep track of token info
       def initialize(token)
         @filename = token.filename
         @lineno = token.lineno
@@ -11,22 +12,25 @@ module Koona
 
     class NBlock
       def initialize
-        @statements = []
+        @statements = [] # Everything inside the block
       end
       attr_accessor :statements
 
+      # Debug
       def to_s
         "{#{@statements.join("\n")}}"
       end
     end
 
     class NIdentifier < Node
+      # Identfiers, like variable and function names
       def initialize(token)
         super token
         @name = token.value
       end
       attr_accessor :name
 
+      # Debug
       def to_s
         "#{@name}"
       end
@@ -39,6 +43,7 @@ module Koona
       end
       attr_accessor :value
 
+      # Debug
       def to_s
         "#{@value}"
       end
@@ -51,6 +56,7 @@ module Koona
       end
       attr_accessor :value
 
+      # Debug
       def to_s
         "#{@value}"
       end
@@ -65,6 +71,7 @@ module Koona
       attr_accessor :id
       attr_accessor :arguments
 
+      # Debug
       def to_s
         "#{@id}(#{@arguments})"
       end
@@ -73,7 +80,7 @@ module Koona
     class NFunctionDeclaration < Node
       def initialize(type, id, arguments, block, token)
         super token
-        @type = type
+        @type = type # return type
         @id = id
         @arguments = arguments
         @block = block
@@ -84,6 +91,7 @@ module Koona
       attr_accessor :arguments
       attr_accessor :block
 
+      # Debug
       def to_s
         "#{@type} #{@id}(#{@arguments}){\n#{@block}\n}"
       end
@@ -100,6 +108,7 @@ module Koona
       attr_accessor :lhs
       attr_accessor :rhs
 
+      # Debug
       def to_s
         "#{@lhs} #{@op.value} #{@rhs}"
       end
@@ -116,6 +125,7 @@ module Koona
       attr_accessor :type
       attr_accessor :expr
 
+      # Debug
       def to_s
         "#{@type} #{@id} = #{@expr}\n"
       end
@@ -130,6 +140,7 @@ module Koona
       attr_accessor :id
       attr_accessor :expr
 
+      # Debug
       def to_s
         "#{@id} = #{@expr}\n"
       end
@@ -143,11 +154,12 @@ module Koona
       attr_accessor :expr
 
       def to_s
-        "return #{@expr}\n"
+        "return: #{@expr}\n"
       end
     end
 
     class VariableList
+      # For function declaration
       def initialize
         @variables = []
       end
@@ -160,6 +172,7 @@ module Koona
     end
 
     class FunctionVar
+      # For function argument declaration. Combine this with variable declartion eventually.
       def initialize(type, id)
         @type = type
         @id = id
