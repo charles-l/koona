@@ -1,4 +1,13 @@
 module Koona
+  class Token
+    def initialize(value, filename, lineno)
+      @value = value
+      @filename = filename
+      @lineno = lineno
+    end
+    attr_reader :value, :filename, :lineno
+  end
+
   class Lexer
     require 'strscan'
     attr_reader :lineno
@@ -30,67 +39,67 @@ module Koona
           when (text = ss.scan(/\/\/.*$/));
 
           when (text = ss.scan(/[a-zA-Z_][a-zA-Z0-9_]*/))
-            @rex_tokens.push action {[:TIDENTIFIER, text]}
+            @rex_tokens.push action {[:TIDENTIFIER, Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/[0-9]+\.[0-9]*/))
-            @rex_tokens.push action {[:TFLOAT, text.to_f]}
+            @rex_tokens.push action {[:TFLOAT, Token.new(text.to_f, @filename, @lineno)]}
 
           when (text = ss.scan(/[0-9]+/))
-            @rex_tokens.push action {[:TINTEGER, text.to_i]}
+            @rex_tokens.push action {[:TINTEGER, Token.new(text.to_i, @filename, @lineno)]}
 
           when (text = ss.scan(/=/))
-            @rex_tokens.push action {[:TEQUAL, text]}
+            @rex_tokens.push action {[:TEQUAL, Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/==/))
-            @rex_tokens.push action {[:TCEQ, text]}
+            @rex_tokens.push action {[:TCEQ, Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\!=/))
-            @rex_tokens.push action {[:TCNE, text]}
+            @rex_tokens.push action {[:TCNE,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\</))
-            @rex_tokens.push action {[:TCLT, text]}
+            @rex_tokens.push action {[:TCLT,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\<=/))
-            @rex_tokens.push action {[:TCLE, text]}
+            @rex_tokens.push action {[:TCLE,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\>/))
-            @rex_tokens.push action {[:TCGT, text]}
+            @rex_tokens.push action {[:TCGT,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\>=/))
-            @rex_tokens.push action {[:TCGE, text]}
+            @rex_tokens.push action {[:TCGE,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\(/))
-                @rex_tokens.push action {[:TLPAREN, text]}
+                @rex_tokens.push action {[:TLPAREN,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\)/))
-            @rex_tokens.push action {[:TRPAREN, text]}
+            @rex_tokens.push action {[:TRPAREN,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\{/))
-            @rex_tokens.push action {[:TLBRACE, text]}
+            @rex_tokens.push action {[:TLBRACE,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\}/))
-            @rex_tokens.push action {[:TRBRACE, text]}
+            @rex_tokens.push action {[:TRBRACE,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\./))
-            @rex_tokens.push action {[:TDOT, text]}
+            @rex_tokens.push action {[:TDOT,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\,/))
-            @rex_tokens.push action {[:TCOMMA, text]}
+            @rex_tokens.push action {[:TCOMMA,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\+/))
-            @rex_tokens.push action {[:TPLUS, text]}
+            @rex_tokens.push action {[:TPLUS,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\-/))
-            @rex_tokens.push action {[:TMINUS, text]}
+            @rex_tokens.push action {[:TMINUS,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\*/))
-            @rex_tokens.push action {[:TMUL, text]}
+            @rex_tokens.push action {[:TMUL,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\//))
-            @rex_tokens.push action {[:TDIV, text]}
+            @rex_tokens.push action {[:TDIV,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/return/))
-            @rex_tokens.push action {[:TRETURN, text]}
+            @rex_tokens.push action {[:TRETURN,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/./))
             @rex_tokens.push action { return "Unexpected character!"}

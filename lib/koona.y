@@ -7,41 +7,51 @@ class Koona::Parser
 
   start program
 rule
-  program : stmts {programBlock = NBlock.new; programBlock.statements << val[0]}
-  stmts : stmt {result = NBlock.new; result.statements << val[0]} 
-        | stmts stmt {val[0].statements << val[1]}
+  program : stmts {result = Koona::AST::NBlock.new; result.statements << val[0]}
+  stmts : stmt {result = Koona::AST::NBlock.new; result.statements << val[0]}
+        | stmts stmt {val[0].statments << val[1]}
+
   stmt : expr
        | block 
        | func_decl
        | var_decl
-  block : TLBRACE TRBRACE {result = NBlock.new}
-        | TLBRACE stmts TRBRACE {result = NBlock.new; result.statements << val[1]}
-  var_decl : ident ident TEQUAL expr {result = NVariableDeclaration.new(val[0], val[1], val[3])}
+
+  block : TLBRACE TRBRACE {result = Koona::AST::NBlock.new}
+        | TLBRACE stmts TRBRACE {result = Koona::AST::NBlock.new << val[1]}
+
+  var_decl : ident ident TEQUAL expr {result = Koona::AST::NVariableDeclaration.new(val[0], val[1], val[3], val[0])}
+
   func_decl : ident ident TLPAREN func_decl_args TRPAREN block 
-            { result = NFunctionDeclaration.new(val[0], val[1], val[3], val[5])}
-  func_decl_args : {VariableList.new([])}
-                 | ident ident {result = VariableList.new; result.variables << FunctionVar.new(val[0], val[1])}
-                 | func_decl_args TCOMMA ident ident {val[0].variables << FunctionVar.new(val[2], val[3])}
-  ident : TIDENTIFIER {result = NIdentifier.new(val[0])}
-  numeric : TINTEGER {result = NInteger.new(val[0])}
-          | TDOUBLE {result = NFloat.new(val[0])}
-  expr : TRETURN expr {result = NReturn.new(val[1])}
-       | ident TEQUAL expr {result = NVariableAssignment.new(val[0], val[2])}
+            {result = Koona::AST::NFunctionDeclaration.new(val[0], val[1], val[3], val[5], val[0])}
+
+  func_decl_args : {result = Koona::AST::VariableList.new}
+                 | ident ident {result = Koona::AST::VariableList.new; result.variables << Koona::AST::FunctionVar.new(val[0], val[1])}
+                 | func_decl_args TCOMMA ident ident {val[0].variables << Koona::AST::FunctionVar.new(val[2], val[3])}
+
+  ident : TIDENTIFIER {result = Koona::AST::NIdentifier.new(val[0])}
+
+  numeric : TINTEGER {result = Koona::AST::NInteger.new(val[0])}
+          | TDOUBLE {result = Koona::AST::NFloat.new(val[0])}
+
+  expr : TRETURN expr {result = Koona::AST::NReturn.new(val[1], val[0])}
+       | ident TEQUAL expr {result = Koona::AST::NVariableAssignment.new(val[0], val[2], val[0])}
        | numeric
        | ident 
-       | ident TLPAREN call_args TRPAREN {result = NFunctionCall.new(val[0], val[2])}
-       | expr comparison expr {result = NBinaryOperator.new(val[0], val[1], val[2])}
-       | TLPAREN expr TRPAREN {result = val[1]}
-  call_args : {result = VariableList.new}
-            | expr {result = VariableList.new; result.variables << val[0]}
+       | ident TLPAREN call_args TRPAREN {result = Koona::AST::NFunctionCall.new(val[0], val[2])}
+       | expr comparison expr {result = Koona::AST::NBinaryOperator.new(val[0], val[1], val[2])}
+       | TLPAREN expr TRPAREN {result = val[1]} # Check this later. Might be causing bugs.
+
+  call_args : {result = Koona::AST::VariableList.new}
+            | expr {result = Koona::AST::VariableList.new; result.variables << val[0]}
             | call_args TCOMMA expr {val[0].variables << val[2]}
+
   comparison : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE 
              | TPLUS | TMINUS | TMUL | TDIV
 end
 
 ---- header
-  require './lib/node.rb'
-  require './lib/lexer.rb'
+  require './lib/lexer'
+  require './lib/ast'
 
 
 ---- inner

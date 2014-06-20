@@ -6,14 +6,14 @@
 
 require 'racc/parser.rb'
 
-  require './lib/node.rb'
-  require './lib/lexer.rb'
+  require './lib/lexer'
+  require './lib/ast'
 
 
 module Koona
   class Parser < Racc::Parser
 
-module_eval(<<'...end koona.y/module_eval...', 'koona.y', 48)
+module_eval(<<'...end koona.y/module_eval...', 'koona.y', 58)
   def on_error(tok, val, vstack)
     $stderr.puts "Parse error on value: \"#{val.to_s}\"", "Stack: #{vstack.inspect}"
   end
@@ -247,21 +247,21 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'koona.y', 9)
   def _reduce_1(val, _values, result)
-    programBlock = NBlock.new; programBlock.statements << val[0]
+    result = Koona::AST::NBlock.new; result.statements << val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 10)
   def _reduce_2(val, _values, result)
-    result = NBlock.new; result.statements << val[0]
+    result = Koona::AST::NBlock.new; result.statements << val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 11)
   def _reduce_3(val, _values, result)
-    val[0].statements << val[1]
+    val[0].statments << val[1]
     result
   end
 .,.,
@@ -274,86 +274,86 @@ module_eval(<<'.,.,', 'koona.y', 11)
 
 # reduce 7 omitted
 
-module_eval(<<'.,.,', 'koona.y', 16)
-  def _reduce_8(val, _values, result)
-    result = NBlock.new
-    result
-  end
-.,.,
-
-module_eval(<<'.,.,', 'koona.y', 17)
-  def _reduce_9(val, _values, result)
-    result = NBlock.new; result.statements << val[1]
-    result
-  end
-.,.,
-
 module_eval(<<'.,.,', 'koona.y', 18)
-  def _reduce_10(val, _values, result)
-    result = NVariableDeclaration.new(val[0], val[1], val[3])
+  def _reduce_8(val, _values, result)
+    result = Koona::AST::NBlock.new
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 20)
-  def _reduce_11(val, _values, result)
-     result = NFunctionDeclaration.new(val[0], val[1], val[3], val[5])
+module_eval(<<'.,.,', 'koona.y', 19)
+  def _reduce_9(val, _values, result)
+    result = Koona::AST::NBlock.new << val[1]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 21)
-  def _reduce_12(val, _values, result)
-    VariableList.new([])
-    result
-  end
-.,.,
-
-module_eval(<<'.,.,', 'koona.y', 22)
-  def _reduce_13(val, _values, result)
-    result = VariableList.new; result.variables << FunctionVar.new(val[0], val[1])
-    result
-  end
-.,.,
-
-module_eval(<<'.,.,', 'koona.y', 23)
-  def _reduce_14(val, _values, result)
-    val[0].variables << FunctionVar.new(val[2], val[3])
+  def _reduce_10(val, _values, result)
+    result = Koona::AST::NVariableDeclaration.new(val[0], val[1], val[3], val[0])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 24)
-  def _reduce_15(val, _values, result)
-    result = NIdentifier.new(val[0])
-    result
-  end
-.,.,
-
-module_eval(<<'.,.,', 'koona.y', 25)
-  def _reduce_16(val, _values, result)
-    result = NInteger.new(val[0])
+  def _reduce_11(val, _values, result)
+    result = Koona::AST::NFunctionDeclaration.new(val[0], val[1], val[3], val[5], val[0])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 26)
-  def _reduce_17(val, _values, result)
-    result = NFloat.new(val[0])
+  def _reduce_12(val, _values, result)
+    result = Koona::AST::VariableList.new
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 27)
-  def _reduce_18(val, _values, result)
-    result = NReturn.new(val[1])
+  def _reduce_13(val, _values, result)
+    result = Koona::AST::VariableList.new; result.variables << Koona::AST::FunctionVar.new(val[0], val[1])
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 28)
+  def _reduce_14(val, _values, result)
+    val[0].variables << Koona::AST::FunctionVar.new(val[2], val[3])
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'koona.y', 30)
+  def _reduce_15(val, _values, result)
+    result = Koona::AST::NIdentifier.new(val[0])
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'koona.y', 32)
+  def _reduce_16(val, _values, result)
+    result = Koona::AST::NInteger.new(val[0])
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'koona.y', 33)
+  def _reduce_17(val, _values, result)
+    result = Koona::AST::NFloat.new(val[0])
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'koona.y', 35)
+  def _reduce_18(val, _values, result)
+    result = Koona::AST::NReturn.new(val[1], val[0])
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'koona.y', 36)
   def _reduce_19(val, _values, result)
-    result = NVariableAssignment.new(val[0], val[2])
+    result = Koona::AST::NVariableAssignment.new(val[0], val[2], val[0])
     result
   end
 .,.,
@@ -362,42 +362,42 @@ module_eval(<<'.,.,', 'koona.y', 28)
 
 # reduce 21 omitted
 
-module_eval(<<'.,.,', 'koona.y', 31)
+module_eval(<<'.,.,', 'koona.y', 39)
   def _reduce_22(val, _values, result)
-    result = NFunctionCall.new(val[0], val[2])
+    result = Koona::AST::NFunctionCall.new(val[0], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 32)
+module_eval(<<'.,.,', 'koona.y', 40)
   def _reduce_23(val, _values, result)
-    result = NBinaryOperator.new(val[0], val[1], val[2])
+    result = Koona::AST::NBinaryOperator.new(val[0], val[1], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 33)
+module_eval(<<'.,.,', 'koona.y', 41)
   def _reduce_24(val, _values, result)
     result = val[1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 34)
+module_eval(<<'.,.,', 'koona.y', 43)
   def _reduce_25(val, _values, result)
-    result = VariableList.new
+    result = Koona::AST::VariableList.new
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 35)
+module_eval(<<'.,.,', 'koona.y', 44)
   def _reduce_26(val, _values, result)
-    result = VariableList.new; result.variables << val[0]
+    result = Koona::AST::VariableList.new; result.variables << val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 36)
+module_eval(<<'.,.,', 'koona.y', 45)
   def _reduce_27(val, _values, result)
     val[0].variables << val[2]
     result
