@@ -86,7 +86,7 @@ module Koona
       when Koona::AST::NVariableAssignment
         generate_var_assignment(stmt)
       when Koona::AST::NReturn
-        generate_return_statement(stmt)
+        generate_return(stmt)
       when Koona::AST::NFunctionDeclaration
         generate_func_decl(stmt)
       else
@@ -97,15 +97,15 @@ module Koona
     def generate_expr(expr)
       case expr
       when Koona::AST::NIdentifier
-        expr.name
+        write expr.name
       when Koona::AST::NBinaryOperator
         generate_expr(expr.lhs)
-        write "#{expr.op}"
+        write "#{expr.op.value}"
         generate_expr(expr.rhs)
       when Koona::AST::NInteger
-        expr.value.to_s
+        write expr.value.to_s
       when Koona::AST::NDouble
-        expr.value.to_s
+        write expr.value
       else
         raise CompileError, "need generate_expr handler for #{expr.class.name}"
       end
@@ -151,7 +151,7 @@ module Koona
       end
       push_scope
       write "#{stmt.type.name} #{stmt.id.name}("
-      write generate_var_list(stmt.arguments)
+      generate_var_list(stmt.arguments)
       write ")\n{\n"
       with_indent do
         generate_block(stmt.block)
@@ -170,6 +170,14 @@ module Koona
     end
 
     def generate_func_call(stmt)
+    end
+    
+    def generate_return(stmt)
+      write "return"
+      if !stmt.expr.nil?
+        generate_expr stmt.expr
+      end
+      writeln ";"
     end
   end
 end
