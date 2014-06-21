@@ -28,8 +28,11 @@ module Koona
       @indent -= 1
     end
 
-    def write(s)
+    def lnstart
       @output += ("  " * @indent)
+    end
+
+    def write(s)
       @output += s
     end
 
@@ -63,32 +66,39 @@ module Koona
     end
 
     def generate_block(block)
+      lnstart
       writeln "{"
       with_indent do
         block.statements.each do |stmt|
-          if stmt.class != Koona::AST::NBlock then
-            generate_stmt stmt
-          else
+          if stmt.class == Koona::AST::NBlock then
             generate_block stmt
+          else
+            begin
+              generate_stmt stmt
+            rescue CompileError
+              # FIXME Hack to check stmts, too.
+              generate_expr stmt
+            end
           end
         end
       end
+      lnstart
       writeln "}"
       @output
     end
 
     def generate_stmt(stmt)
       case stmt
-      when Koona::AST::NFunctionCall
-        generate_func_call(stmt)
       when Koona::AST::NVariableDeclaration
         generate_var_decl(stmt)
       when Koona::AST::NVariableAssignment
         generate_var_assignment(stmt)
-      when Koona::AST::NReturn
-        generate_return(stmt)
+      when Koona::AST::NFunctionCall
+        generate_func_call(stmt)
       when Koona::AST::NFunctionDeclaration
         generate_func_decl(stmt)
+      when Koona::AST::NReturn
+        generate_return(stmt)
       else
         raise CompileError, "need generate_stmt handler for #{stmt.class.name}"
       end
@@ -112,6 +122,7 @@ module Koona
     end
 
     def generate_var_decl(stmt)
+      lnstart
       if symbol_exists?(stmt.id.name)
         v = find_symbol(stmt.id.name)
         message = "#{stmt.id.name} is already defined in scope as a #{v[:type]} at line #{v[:lineno]}"
@@ -131,8 +142,9 @@ module Koona
     end
 
     def generate_var_assignment(stmt)
+      lnstart
       if !symbol_exists?(stmt.id.name)
-        message = "variable '#{stmt.id}' has not been defined in scope."
+        message = "variable '#{stmt.id.name}' has not been defined in scope."
         raise CompileError.new(message, :node=>stmt)
       end
       if stmt.expr.nil?
@@ -146,13 +158,14 @@ module Koona
     def generate_func_decl(stmt)
       if symbol_exists?(stmt.id.name)
         v = find_symbol(stmt.id.name)
-        message = "function '#{stmt.id}' has already been defined in scope with a return type of #{v[:type]} at line #{v[:lineno]}"
+        message = "function '#{stmt.id.name}' has already been defined in scope with a return type of #{v[:type]} at line #{v[:lineno]}"
         raise CompileError.new(message, :node=>stmt)
       end
       push_scope
+      lnstart
       write "#{stmt.type.name} #{stmt.id.name}("
       generate_var_list(stmt.arguments)
-      write ")\n{\n"
+      writeln "){"
       with_indent do
         generate_block(stmt.block)
       end
@@ -170,10 +183,19 @@ module Koona
     end
 
     def generate_func_call(stmt)
+      if !symbol_exists?(stmt.id.name)
+        message = "function '#{stmt.id.name}' has not been defined in scope!"
+        raise CompileError.new(message)
+      end
+      lnstart
+      write "#{stmt.id.name}("
+      generate_var_list(stmt.arguments)
+      writeln");"
     end
     
     def generate_return(stmt)
-      write "return"
+      lnstart
+      write "return "
       if !stmt.expr.nil?
         generate_expr stmt.expr
       end

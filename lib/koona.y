@@ -6,17 +6,18 @@ class Koona::Parser
   token TRETURN
 
   start program
-rule
+  rule
   program : stmts {result = Koona::AST::NBlock.new; result.statements << val[0]}
-  stmts : stmt {result = Koona::AST::NBlock.new; result.statements << val[0]}
-        | stmts stmt {val[0].statements << val[1]}
+stmts : stmt {result = Koona::AST::NBlock.new; result.statements << val[0]}
+| stmts stmt {val[0].statements << val[1]}
 
-  stmt : expr
-       | block 
-       | func_decl
-       | var_decl
+stmt : return_stmt
+| expr
+| block 
+| func_decl
+| var_decl
 
-  block : TLBRACE TRBRACE {result = Koona::AST::NBlock.new}
+block : TLBRACE TRBRACE {result = Koona::AST::NBlock.new}
         | TLBRACE stmts TRBRACE {result = Koona::AST::NBlock.new; result.statements << val[1]}
 
   var_decl : ident ident TEQUAL expr {result = Koona::AST::NVariableDeclaration.new(val[0], val[1], val[3], val[0])}
@@ -27,14 +28,15 @@ rule
   func_decl_args : {result = Koona::AST::VariableList.new}
                  | ident ident {result = Koona::AST::VariableList.new; result.variables << Koona::AST::FunctionVar.new(val[0], val[1])}
                  | func_decl_args TCOMMA ident ident {val[0].variables << Koona::AST::FunctionVar.new(val[2], val[3])}
+  return_stmt : TRETURN {result = Koona::AST::NReturn.new(val[0], nil)}
+              | TRETURN expr {result = Koona::AST::NReturn.new(val[0], val[1])}
 
   ident : TIDENTIFIER {result = Koona::AST::NIdentifier.new(val[0])}
 
   numeric : TINTEGER {result = Koona::AST::NInteger.new(val[0])}
           | TDOUBLE {result = Koona::AST::NFloat.new(val[0])}
 
-  expr : TRETURN expr {result = Koona::AST::NReturn.new(val[1], val[0])}
-       | ident TEQUAL expr {result = Koona::AST::NVariableAssignment.new(val[0], val[2], val[0])}
+  expr : ident TEQUAL expr {result = Koona::AST::NVariableAssignment.new(val[0], val[2], val[0])}
        | numeric
        | ident 
        | ident TLPAREN call_args TRPAREN {result = Koona::AST::NFunctionCall.new(val[0], val[2])}

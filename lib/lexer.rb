@@ -38,6 +38,9 @@ module Koona
 
           when (text = ss.scan(/\/\/.*$/));
 
+          when (text = ss.scan(/return/))
+            @rex_tokens.push action {[:TRETURN, Token.new(text, @filename, @lineno)]}
+
           when (text = ss.scan(/[a-zA-Z_][a-zA-Z0-9_]*/))
             @rex_tokens.push action {[:TIDENTIFIER, Token.new(text, @filename, @lineno)]}
 
@@ -97,9 +100,6 @@ module Koona
 
           when (text = ss.scan(/\//))
             @rex_tokens.push action {[:TDIV,Token.new(text, @filename, @lineno)]}
-
-          when (text = ss.scan(/return/))
-            @rex_tokens.push action {[:TRETURN,Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/./))
             @rex_tokens.push action { return "Unexpected character!"}
