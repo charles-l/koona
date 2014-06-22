@@ -13,8 +13,8 @@ module Koona
     end
 
     def generate(ast)
-      @indent = 1
       @output = ""
+      @function_output = ""
       @scope_depth = 0
       @scope = {}
       @scope_stack = []
@@ -22,12 +22,7 @@ module Koona
       @output += "int main()\n{\n"
       @output += generate_block ast
       @output += "return 0;\n}\n"
-    end
-
-    def with_indent &block
-      @indent += 1
-      yield
-      @indent -= 1
+      @output = @function_output + @output
     end
 
     def find_symbol(name)
@@ -57,13 +52,11 @@ module Koona
     def generate_block(block)
       r = ""
       r += "{\n"
-      with_indent do
-        block.statementlist.statements.each do |stmt|
-          if stmt.class == Koona::AST::NBlock then
-            r += generate_block stmt
-          else
-            r += generate_stmt stmt
-          end
+      block.statementlist.statements.each do |stmt|
+        if stmt.class == Koona::AST::NBlock then
+          r += generate_block stmt
+        else
+          r += generate_stmt stmt
         end
       end
       r += "}\n"
@@ -81,7 +74,8 @@ module Koona
       when Koona::AST::NFunctionCall
         generate_func_call(stmt)
       when Koona::AST::NFunctionDeclaration
-        generate_func_decl(stmt)
+        @function_output += generate_func_decl(stmt) # Send function declarations to @function_output
+        "" # Return empty string so it doesn't define the function in main()
       when Koona::AST::NReturn
         generate_return(stmt)
       else
@@ -162,9 +156,7 @@ module Koona
       r += "#{stmt.type.name} #{stmt.id.name}("
       r += generate_var_list(stmt.arguments)
       r += ")\n"
-      with_indent do
-        r += generate_block(stmt.block)
-      end
+      r += generate_block(stmt.block)
       pop_scope
 
       @scope[stmt.id.name] = {
