@@ -173,11 +173,10 @@ module Koona
       lnstart
       write "#{stmt.type.name} #{stmt.id.name}("
       generate_var_list(stmt.arguments)
-      writeln "){"
+      writeln ")"
       with_indent do
         generate_block(stmt.block)
       end
-      writeln "}"
       pop_scope
 
       @scope[stmt.id.name] = {
