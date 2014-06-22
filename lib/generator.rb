@@ -13,32 +13,21 @@ module Koona
     end
 
     def generate(ast)
-      @indent = 0
+      @indent = 1
       @output = ""
       @scope_depth = 0
       @scope = {}
       @scope_stack = []
 
-      generate_block ast
+      @output += "int main()\n{\n"
+      @output += generate_block ast
+      @output += "return 0;\n}\n"
     end
 
     def with_indent &block
       @indent += 1
       yield
       @indent -= 1
-    end
-
-    def lnstart
-      @output += ("  " * @indent)
-    end
-
-    def write(s)
-      @output += s
-    end
-
-    def writeln(s="")
-      write(s)
-      @output += "\n"
     end
 
     def find_symbol(name)
@@ -66,25 +55,19 @@ module Koona
     end
 
     def generate_block(block)
-      lnstart
-      writeln "{"
+      r = ""
+      r += "{\n"
       with_indent do
         block.statementlist.statements.each do |stmt|
           if stmt.class == Koona::AST::NBlock then
-            generate_block stmt
+            r += generate_block stmt
           else
-            begin
-              generate_stmt stmt
-            rescue CompileError
-              # FIXME Hack to check stmts, too.
-              generate_expr stmt
-            end
+            r += generate_stmt stmt
           end
         end
       end
-      lnstart
-      writeln "}"
-      @output
+      r += "}\n"
+      r
     end
 
     def generate_stmt(stmt)
@@ -102,55 +85,59 @@ module Koona
       when Koona::AST::NReturn
         generate_return(stmt)
       else
-        raise CompileError, "need generate_stmt handler for #{stmt.class.name}"
+        generate_expr stmt
+        # FIXME Should raise an error, but for now, runs generate_expr instead
+        # raise CompileError, "need generate_stmt handler for #{stmt.class.name}"
       end
     end
 
     def generate_expr(expr)
       case expr
       when Koona::AST::NIdentifier
-        write expr.name
+        expr.name
       when Koona::AST::NBinaryOperator
-        generate_expr(expr.lhs)
-        write "#{expr.op.value}"
-        generate_expr(expr.rhs)
+        "#{generate_expr expr.lhs} #{expr.op.value} #{generate_expr expr.rhs}"
       when Koona::AST::NInteger
-        write expr.value.to_s
+        expr.value.to_s
       when Koona::AST::NDouble
-        write expr.value
+        expr.value.to_s
       else
         raise CompileError, "need generate_expr handler for #{expr.class.name}"
       end
     end
 
     def generate_var_decl(stmt)
-      lnstart
+      r = ""
       if symbol_exists?(stmt.id.name)
         v = find_symbol(stmt.id.name)
         message = "#{stmt.id.name} is already defined in scope as a #{v[:type]} at line #{v[:lineno]}"
         raise CompileError.new(message, :node=>stmt)
       end
-      write "#{stmt.type} #{stmt.id}"
+      r += "#{stmt.type} #{stmt.id}"
       if !stmt.expr.nil?
-        write " = "
-        generate_expr stmt.expr
+        r += " = "
+        r += generate_expr stmt.expr
       end
-      writeln ";"
+      r+= ";\n"
 
       @scope[stmt.id.name] = {
         :type => stmt.type.name,
         :lineno => stmt.lineno.to_i
       }
+
+      r
     end
 
     def generate_stmt_list(stmt)
+      r = ""
       stmt.statements.each do |s|
-        generate_stmt(s)
+        r += generate_stmt(s)
       end
+      r
     end
 
     def generate_var_assignment(stmt)
-      lnstart
+      r = ""
       if !symbol_exists?(stmt.id.name)
         message = "variable '#{stmt.id.name}' has not been defined in scope."
         raise CompileError.new(message, :node=>stmt)
@@ -158,24 +145,25 @@ module Koona
       if stmt.expr.nil?
         raise CompilerError.new("Missing assignment expression!", :node=>stmt)
       end
-      write "#{stmt.id} = "
-      generate_expr stmt.expr
-      writeln ";"
+      r += "#{stmt.id} = "
+      r += generate_expr stmt.expr
+      r += ";\n"
+      r
     end
     
     def generate_func_decl(stmt)
+      r = ""
       if symbol_exists?(stmt.id.name)
         v = find_symbol(stmt.id.name)
         message = "function '#{stmt.id.name}' has already been defined in scope with a return type of #{v[:type]} at line #{v[:lineno]}"
         raise CompileError.new(message, :node=>stmt)
       end
       push_scope
-      lnstart
-      write "#{stmt.type.name} #{stmt.id.name}("
-      generate_var_list(stmt.arguments)
-      writeln ")"
+      r += "#{stmt.type.name} #{stmt.id.name}("
+      r += generate_var_list(stmt.arguments)
+      r += ")\n"
       with_indent do
-        generate_block(stmt.block)
+        r += generate_block(stmt.block)
       end
       pop_scope
 
@@ -183,30 +171,33 @@ module Koona
         :kind => "function",
         :lineno => stmt.lineno
       }
+      r
     end
     
     def generate_var_list(stmt)
-      write "#{stmt.variables.join(", ")}"
+      "#{stmt.variables.join(", ")}"
     end
 
     def generate_func_call(stmt)
+      r = ""
       if !symbol_exists?(stmt.id.name)
         message = "function '#{stmt.id.name}' has not been defined in scope!"
         raise CompileError.new(message)
       end
-      lnstart
-      write "#{stmt.id.name}("
-      generate_var_list(stmt.arguments)
-      writeln");"
+      r += "#{stmt.id.name}("
+      r += generate_var_list(stmt.arguments)
+      r += ");\n"
+      r
     end
     
     def generate_return(stmt)
-      lnstart
-      write "return "
+      r = ""
+      r += "return "
       if !stmt.expr.nil?
-        generate_expr stmt.expr
+        r += generate_expr stmt.expr
       end
-      writeln ";"
+      r += ";\n"
+      r
     end
   end
 end

@@ -18,7 +18,7 @@ module Koona
 
       # Debug
       def to_s
-        "{#{@statements.join("\n")}}"
+        "#{@statementlist}"
       end
     end
 
@@ -27,6 +27,9 @@ module Koona
         @statements = []
       end
 
+      def to_s
+        "#{@statements}"
+      end
       attr_accessor :statements
     end
 
