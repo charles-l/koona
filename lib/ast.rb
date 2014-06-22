@@ -11,15 +11,23 @@ module Koona
     end
 
     class NBlock
-      def initialize
-        @statements = [] # Everything inside the block
+      def initialize(list)
+        @statementlist = list
       end
-      attr_accessor :statements
+      attr_accessor :statementlist
 
       # Debug
       def to_s
         "{#{@statements.join("\n")}}"
       end
+    end
+
+    class NStatementList
+      def initialize
+        @statements = []
+      end
+
+      attr_accessor :statements
     end
 
     class NIdentifier < Node

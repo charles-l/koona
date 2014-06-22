@@ -248,14 +248,14 @@ Racc_debug_parser = false
 
 module_eval(<<'.,.,', 'koona.y', 9)
   def _reduce_1(val, _values, result)
-    result = Koona::AST::NBlock.new; result.statements << val[0]
+    result = Koona::AST::NBlock.new(Koona::AST::NStatementList.new); result.statementlist.statements << val[0]
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'koona.y', 10)
   def _reduce_2(val, _values, result)
-    result = Koona::AST::NBlock.new; result.statements << val[0]
+    result = Koona::AST::NStatementList.new; result.statements << val[0]
     result
   end
 .,.,
@@ -286,7 +286,7 @@ module_eval(<<'.,.,', 'koona.y', 19)
 
 module_eval(<<'.,.,', 'koona.y', 20)
   def _reduce_10(val, _values, result)
-    result = Koona::AST::NBlock.new; result.statements << val[1]
+    result = Koona::AST::NBlock.new(Koona::AST::NStatementList.new); result.statementlist.statements << val[1]
     result
   end
 .,.,

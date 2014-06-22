@@ -69,7 +69,7 @@ module Koona
       lnstart
       writeln "{"
       with_indent do
-        block.statements.each do |stmt|
+        block.statementlist.statements.each do |stmt|
           if stmt.class == Koona::AST::NBlock then
             generate_block stmt
           else
@@ -89,6 +89,8 @@ module Koona
 
     def generate_stmt(stmt)
       case stmt
+      when Koona::AST::NStatementList
+        generate_stmt_list(stmt)
       when Koona::AST::NVariableDeclaration
         generate_var_decl(stmt)
       when Koona::AST::NVariableAssignment
@@ -139,6 +141,12 @@ module Koona
         :type => stmt.type.name,
         :lineno => stmt.lineno.to_i
       }
+    end
+
+    def generate_stmt_list(stmt)
+      stmt.statements.each do |s|
+        generate_stmt(s)
+      end
     end
 
     def generate_var_assignment(stmt)
