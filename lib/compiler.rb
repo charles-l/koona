@@ -1,3 +1,6 @@
+require './lib/parser.rb'
+require './lib/generator.rb'
+
 module Koona
   class Compiler
     def compile(input, debug=false)

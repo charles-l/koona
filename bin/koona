@@ -1,6 +1,4 @@
 #!/usr/bin/env ruby
-require './lib/parser.rb'
-require './lib/generator.rb'
 require './lib/compiler.rb'
 require 'thor'
 

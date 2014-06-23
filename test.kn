@@ -1,6 +1,6 @@
 int x=3
 x = x+1
-// this is acomment
+// this is a comment
 int addVal(int var, int val)
 {
   return var + val
