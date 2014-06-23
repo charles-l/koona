@@ -1,3 +1,3 @@
 all:
 	racc lib/koona.y -o lib/parser.rb
-	bin/koona test.kn
+	bin/koona compile test.kn --debug

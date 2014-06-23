@@ -1,10 +1,12 @@
 module Koona
   class Compiler
-    def compile(input)
+    def compile(input, debug=false)
       lexer = Koona::Lexer.new
       parser = Koona::Parser.new
       generator = Koona::Generator.new
-      puts generator.generate(parser.parse(lexer.scan_file(input)))
+      ast = parser.parse(lexer.scan_file(input))
+      puts ast if debug
+      generator.generate(ast)
     end
   end
 end

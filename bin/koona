@@ -2,11 +2,23 @@
 require './lib/parser.rb'
 require './lib/generator.rb'
 require './lib/compiler.rb'
+require 'thor'
 
-if ARGV[0]
-  File.open("#{ARGV[0].gsub('.kn', '.c')}", 'w') do |f|
-    f.puts Koona::Compiler.new.compile(ARGV[0])
+class KoonaCLI < Thor
+  desc "compile FILE", "compiles FILE to C"
+  long_desc <<-LONGDESC
+    `koona compile` will compile a file with valid koona grammer to C 
+    which is then compiled to an executible using clang if `--clang` flag is set.
+    If not, koona will just compile to C.
+  LONGDESC
+  option :debug, :type => :boolean
+  option :clang, :type => :boolean
+  def compile(file)
+    File.open("#{file.gsub('.kn', '.c')}", 'w') do |f|
+      f.puts Koona::Compiler.new.compile(file, options[:debug])
+    end
+    system "clang -o #{file.gsub('.kn', '')} #{file.gsub('.kn', '.c')}; rm #{file.gsub('.kn', '.c')}" if options[:clang]
   end
-else 
-  abort("Requires input file...")
 end
+
+KoonaCLI.start(ARGV)
