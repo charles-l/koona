@@ -74,14 +74,13 @@ module Koona
       when Koona::AST::NFunctionCall
         generate_func_call(stmt)
       when Koona::AST::NFunctionDeclaration
+        # TODO. Do this differently if you can think of an idea.
         @function_output += generate_func_decl(stmt) # Send function declarations to @function_output
         "" # Return empty string so it doesn't define the function in main()
       when Koona::AST::NReturn
         generate_return(stmt)
       else
-        generate_expr stmt
-        # FIXME Should raise an error, but for now, runs generate_expr instead
-        # raise CompileError, "need generate_stmt handler for #{stmt.class.name}"
+        raise CompileError, "need generate_stmt handler for #{stmt.class.name}"
       end
     end
 

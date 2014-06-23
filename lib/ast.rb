@@ -5,9 +5,8 @@ module Koona
       def initialize(token)
         @filename = token.filename
         @lineno = token.lineno
-        @token = token
       end
-      attr_reader :filename, :lineno, :offset, :token
+      attr_reader :filename, :lineno, :offset
     end
 
     class NBlock

@@ -5,7 +5,12 @@ module Koona
       parser = Koona::Parser.new
       generator = Koona::Generator.new
       ast = parser.parse(lexer.scan_file(input))
-      puts ast if debug
+      if debug then
+        puts '-' * 40
+        puts 'AST Debug info'
+        puts '-' * 40
+        puts ast
+      end
       generator.generate(ast)
     end
   end
