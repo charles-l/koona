@@ -73,14 +73,6 @@ module Koona
       end
     end
 
-    class NReturn < Node
-      def initialize(token)
-        super token
-        @expr = token.value
-      end
-      attr_accessor :expr
-    end
-
     class NFunctionCall
       def initialize(id, arguments)
         @id = id
@@ -151,7 +143,7 @@ module Koona
     end
 
     class NReturn < Node
-      def initialize(token, expr)
+      def initialize(expr, token)
         super token
         @expr = expr
       end

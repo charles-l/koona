@@ -6,4 +6,5 @@ int addVal(int var, int val)
   return var + val
 }
 
+var = var + 1
 addVal((x), 2)

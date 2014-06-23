@@ -13,7 +13,7 @@ require 'racc/parser.rb'
 module Koona
   class Parser < Racc::Parser
 
-module_eval(<<'...end koona.y/module_eval...', 'koona.y', 61)
+module_eval(<<'...end koona.y/module_eval...', 'koona.y', 62)
   def on_error(tok, val, vstack)
     $stderr.puts "Parse error on value: \"#{val.to_s}\"", "Stack: #{vstack.inspect}"
   end
@@ -295,75 +295,75 @@ module_eval(<<'.,.,', 'koona.y', 21)
 
 module_eval(<<'.,.,', 'koona.y', 23)
   def _reduce_12(val, _values, result)
-    result = Koona::AST::NVariableDeclaration.new(val[0], val[1], val[3], val[0])
+    result = Koona::AST::NVariableDeclaration.new(val[0], val[1], val[3], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 24)
+module_eval(<<'.,.,', 'koona.y', 25)
   def _reduce_13(val, _values, result)
-    result = Koona::AST::NVariableAssignment.new(val[0], val[2], val[0])
+    result = Koona::AST::NVariableAssignment.new(val[0], val[2], val[1])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 27)
+module_eval(<<'.,.,', 'koona.y', 28)
   def _reduce_14(val, _values, result)
-    result = Koona::AST::NFunctionDeclaration.new(val[0], val[1], val[3], val[5], val[0])
+    result = Koona::AST::NFunctionDeclaration.new(val[0], val[1], val[3], val[5], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 29)
+module_eval(<<'.,.,', 'koona.y', 30)
   def _reduce_15(val, _values, result)
     result = Koona::AST::VariableList.new
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 30)
+module_eval(<<'.,.,', 'koona.y', 31)
   def _reduce_16(val, _values, result)
     result = Koona::AST::VariableList.new; result.variables << Koona::AST::FunctionVar.new(val[0], val[1])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 31)
+module_eval(<<'.,.,', 'koona.y', 32)
   def _reduce_17(val, _values, result)
     val[0].variables << Koona::AST::FunctionVar.new(val[2], val[3])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 32)
-  def _reduce_18(val, _values, result)
-    result = Koona::AST::NReturn.new(val[0], nil)
-    result
-  end
-.,.,
-
 module_eval(<<'.,.,', 'koona.y', 33)
-  def _reduce_19(val, _values, result)
-    result = Koona::AST::NReturn.new(val[0], val[1])
+  def _reduce_18(val, _values, result)
+    result = Koona::AST::NReturn.new(nil, val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 35)
+module_eval(<<'.,.,', 'koona.y', 34)
+  def _reduce_19(val, _values, result)
+    result = Koona::AST::NReturn.new(val[1], val[0])
+    result
+  end
+.,.,
+
+module_eval(<<'.,.,', 'koona.y', 36)
   def _reduce_20(val, _values, result)
     result = Koona::AST::NIdentifier.new(val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 37)
+module_eval(<<'.,.,', 'koona.y', 38)
   def _reduce_21(val, _values, result)
     result = Koona::AST::NInteger.new(val[0])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 38)
+module_eval(<<'.,.,', 'koona.y', 39)
   def _reduce_22(val, _values, result)
     result = Koona::AST::NFloat.new(val[0])
     result
@@ -374,42 +374,42 @@ module_eval(<<'.,.,', 'koona.y', 38)
 
 # reduce 24 omitted
 
-module_eval(<<'.,.,', 'koona.y', 42)
+module_eval(<<'.,.,', 'koona.y', 43)
   def _reduce_25(val, _values, result)
     result = Koona::AST::NFunctionCall.new(val[0], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 43)
+module_eval(<<'.,.,', 'koona.y', 44)
   def _reduce_26(val, _values, result)
     result = Koona::AST::NBinaryOperator.new(val[0], val[1], val[2])
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 44)
+module_eval(<<'.,.,', 'koona.y', 45)
   def _reduce_27(val, _values, result)
     result = val[1]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 46)
+module_eval(<<'.,.,', 'koona.y', 47)
   def _reduce_28(val, _values, result)
     result = Koona::AST::VariableList.new
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 47)
+module_eval(<<'.,.,', 'koona.y', 48)
   def _reduce_29(val, _values, result)
     result = Koona::AST::VariableList.new; result.variables << val[0]
     result
   end
 .,.,
 
-module_eval(<<'.,.,', 'koona.y', 48)
+module_eval(<<'.,.,', 'koona.y', 49)
   def _reduce_30(val, _values, result)
     val[0].variables << val[2]
     result

@@ -1,7 +1,7 @@
 module Koona
   class CompileError < Exception
     def initialize(message, options={})
-      message = "#{options[:node].filename}:#{options[:node].lineno}: #{message}" if options[:node]
+      message = "#{options[:node].filename}:#{options[:node].lineno} #{message}" if options[:node]
       super message
     end
     attr_reader :node
