@@ -41,6 +41,12 @@ module Koona
           when (text = ss.scan(/return/))
             @rex_tokens.push action {[:TRETURN, Token.new(text, @filename, @lineno)]}
 
+          when (text = ss.scan(/if/))
+            @rex_tokens.push action {[:TIF, Token.new(text, @filename, @lineno)]}
+
+          when (text = ss.scan(/else/))
+            @rex_tokens.push action {[:TELSE, Token.new(text, @filename, @lineno)]}
+
           when (text = ss.scan(/[a-zA-Z_][a-zA-Z0-9_]*/))
             @rex_tokens.push action {[:TIDENTIFIER, Token.new(text, @filename, @lineno)]}
 
@@ -49,9 +55,6 @@ module Koona
 
           when (text = ss.scan(/[0-9]+/))
             @rex_tokens.push action {[:TINTEGER, Token.new(text.to_i, @filename, @lineno)]}
-
-          when (text = ss.scan(/=/))
-            @rex_tokens.push action {[:TEQUAL, Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/==/))
             @rex_tokens.push action {[:TCEQ, Token.new(text, @filename, @lineno)]}
@@ -70,6 +73,9 @@ module Koona
 
           when (text = ss.scan(/\>=/))
             @rex_tokens.push action {[:TCGE,Token.new(text, @filename, @lineno)]}
+
+          when (text = ss.scan(/=/))
+            @rex_tokens.push action {[:TEQUAL, Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/\(/))
                 @rex_tokens.push action {[:TLPAREN,Token.new(text, @filename, @lineno)]}

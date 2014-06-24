@@ -3,7 +3,7 @@ class Koona::Parser
   token TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
   token TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
   token TPLUS TMINUS TMUL TDIV
-  token TRETURN
+  token TRETURN TIF TELSE
 
   start program
   rule
@@ -17,6 +17,7 @@ class Koona::Parser
        | func_decl
        | var_decl
        | var_assign
+       | if_stmt
 
   block : TLBRACE TRBRACE {result = Koona::AST::NBlock.new}
         | TLBRACE stmts TRBRACE {result = Koona::AST::NBlock.new(Koona::AST::NStatementList.new); result.statementlist.statements << val[1]}
@@ -24,6 +25,8 @@ class Koona::Parser
   var_decl : ident ident TEQUAL expr {result = Koona::AST::NVariableDeclaration.new(val[0], val[1], val[3], val[2])}
 
   var_assign : ident TEQUAL expr {result = Koona::AST::NVariableAssignment.new(val[0], val[2], val[1])}
+
+  if_stmt : TIF TLPAREN expr TRPAREN block {result = Koona::AST::NIf.new(val[2], val[4], val[0])}
 
   func_decl : ident ident TLPAREN func_decl_args TRPAREN block 
             {result = Koona::AST::NFunctionDeclaration.new(val[0], val[1], val[3], val[5], val[2])}
@@ -60,7 +63,7 @@ end
 
 ---- inner
   def on_error(tok, val, vstack)
-    $stderr.puts "Parse error on value: \"#{val.to_s}\"", "Stack: #{vstack.inspect}"
+    $stderr.puts "#{val.filename}:#{val.lineno} Parse error on value: \"#{val.value}\"", "Stack: #{vstack.inspect}"
   end
   def parse(tokens)
     @tokens = tokens

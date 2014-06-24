@@ -79,6 +79,8 @@ module Koona
         "" # Return empty string so it doesn't define the function in main()
       when Koona::AST::NReturn
         generate_return(stmt)
+      when Koona::AST::NIf
+        generate_if(stmt)
       else
         raise CompileError, "need generate_stmt handler for #{stmt.class.name}"
       end
@@ -97,6 +99,15 @@ module Koona
       else
         raise CompileError, "need generate_expr handler for #{expr.class.name}"
       end
+    end
+
+    def generate_if(stmt)
+      r = ""
+      raise CompileError.new("Expected expression!") if stmt.expr.nil?
+      r += "if(#{generate_expr(stmt.expr)})"
+      raise CompileError.new("if block is empty!") if stmt.block.nil?
+      r += generate_block(stmt.block)
+      r
     end
 
     def generate_var_decl(stmt)

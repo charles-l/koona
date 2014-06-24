@@ -152,6 +152,15 @@ module Koona
       end
     end
 
+    class NIf < Node
+      def initialize(expr, block, token)
+        super token
+        @expr = expr
+        @block = block
+      end
+      attr_accessor :expr, :block
+    end
+
     class NVariableAssignment < Node
       def initialize(id, expr, token)
         super token

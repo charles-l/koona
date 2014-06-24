@@ -6,4 +6,9 @@ int addVal(int var, int val)
   return var + val
 }
 
+if (x == 1)
+{
+  return x
+}
+
 addVal((x), 2)
