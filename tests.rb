@@ -3,63 +3,43 @@ require 'tempfile'
 require 'test/unit'
 
 class TestVarDecl < Test::Unit::TestCase
-  def test_decl
+  def result_test(input, exp_result)
     begin
       c = Koona::Compiler.new
-      input_file = Tempfile.new('TestVarDecl')
+      input_file = Tempfile.new('TestFile')
 
-      input_file << "int x = 5"
-      exp_result = "int main()\n{\n{\nint x = 5;\n}\nreturn 0;\n}\n"
+      input_file << input
+      exp_result = exp_result
       input_file.read # ? Dunno why, but this line is neccessary for the next one to run.
       assert_equal(exp_result, c.compile(input_file))
     ensure # Make sure to delete the temp file
       input_file.close
       input_file.unlink
     end
+  end
+
+  def test_decl
+    result_test("int x = 5", 
+              "int main()\n{\n{\nint x = 5;\n}\nreturn 0;\n}\n")
   end
 
   def test_var_assign
-    begin
-      c = Koona::Compiler.new
-      input_file = Tempfile.new('TestVarDecl')
-
-      input_file << "int x = 5\nx = 2"
-      exp_result = "int main()\n{\n{\nint x = 5;\nx = 2;\n}\nreturn 0;\n}\n"
-      input_file.read # ? Dunno why, but this line is neccessary for the next one to run.
-      assert_equal(exp_result, c.compile(input_file))
-    ensure # Make sure to delete the temp file
-      input_file.close
-      input_file.unlink
-    end
+    result_test("int x = 5\nx = 2", 
+             "int main()\n{\n{\nint x = 5;\nx = 2;\n}\nreturn 0;\n}\n")
   end
 
   def test_func_decl
-    begin
-      c = Koona::Compiler.new
-      input_file = Tempfile.new('TestVarDecl')
-
-      input_file << "int test()\n{\nreturn 1\n}"
-      exp_result = "int test()\n{\nreturn 1;\n}\nint main()\n{\n{\n}\nreturn 0;\n}\n"
-      input_file.read # ? Dunno why, but this line is neccessary for the next one to run.
-      assert_equal(exp_result, c.compile(input_file))
-    ensure # Make sure to delete the temp file
-      input_file.close
-      input_file.unlink
-    end
+    result_test("int test()\n{\nreturn 1\n}", 
+             "int test()\n{\nreturn 1;\n}\nint main()\n{\n{\n}\nreturn 0;\n}\n")
   end
 
   def test_func_call
-    begin
-      c = Koona::Compiler.new
-      input_file = Tempfile.new('TestVarDecl')
+    result_test("int test()\n{\nreturn 1\n}\ntest()", 
+             "int test()\n{\nreturn 1;\n}\nint main()\n{\n{\ntest();\n}\nreturn 0;\n}\n")
+  end
 
-      input_file << "int test()\n{\nreturn 1\n}\ntest()"
-      exp_result = "int test()\n{\nreturn 1;\n}\nint main()\n{\n{\ntest();\n}\nreturn 0;\n}\n"
-      input_file.read # ? Dunno why, but this line is neccessary for the next one to run.
-      assert_equal(exp_result, c.compile(input_file))
-    ensure # Make sure to delete the temp file
-      input_file.close
-      input_file.unlink
-    end
+  def test_if_stmt
+    result_test("if(true){return 0}", 
+                "int main()\n{\n{\nif(true){\nreturn 0;\n}\n}\nreturn 0;\n}\n")
   end
 end
