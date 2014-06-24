@@ -76,6 +76,11 @@ module Koona
       def initialize(token)
         @value = token.value
       end
+
+      def to_s
+        return @value
+      end
+
       attr_accessor :value
     end
 

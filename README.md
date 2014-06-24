@@ -9,8 +9,10 @@ At the moment, Koona will compile a simple syntax into valid C code. What's curr
 - Variable declaration
 - Function declaration (and function calls)
 - Return statements
+- If statements
 - Integers
 - Doubles
+- Booleans
 - Mathematic operations (+, -, \*, /)
 
 A valid `.kn` file:
@@ -18,11 +20,14 @@ A valid `.kn` file:
     int x=3
     x = x+1
     // this is a comment
-    int addVal(int var, int val)
+    int addVal(int var, int val, bool do_add)
     {
-      return (var + val)
+      if(do_add)
+      {
+        return (var + val)
+      }
     }
-    addVal((x), 2)
+    addVal((x), 2, true)
 
 ## Use
 To compile a `.kn` file, run: `bin/koona compile *file.kn*`. A C file will be generated (which you can then edit, or compile).

@@ -23,6 +23,8 @@ module Koona
       @output += generate_block ast
       @output += "return 0;\n}\n"
       @output = @function_output + @output
+      # Put include stuff at the top
+      @output = "#include <stdbool.h>\n" + @output
     end
 
     def find_symbol(name)

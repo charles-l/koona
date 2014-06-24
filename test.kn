@@ -1,16 +1,11 @@
 int x=3
 x = x+1
 // this is a comment
-int addVal(int var, int val)
+int addVal(int var, int val, bool do_add)
 {
-  return var + val
+  if(do_add)
+  {
+    return (var + val)
+  }
 }
-
-if (x == 1)
-{
-  return x
-}
-
-x = true
-
-addVal((x), 2)
+addVal((x), 2, true)
