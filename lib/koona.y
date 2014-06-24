@@ -4,6 +4,7 @@ class Koona::Parser
   token TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
   token TPLUS TMINUS TMUL TDIV
   token TRETURN TIF TELSE
+  token TTRUE TFALSE
 
   start program
   rule
@@ -42,7 +43,11 @@ class Koona::Parser
   numeric : TINTEGER {result = Koona::AST::NInteger.new(val[0])}
           | TDOUBLE {result = Koona::AST::NFloat.new(val[0])}
 
+  bool : TTRUE {result = Koona::AST::NBool.new(val[0])}
+       | TFALSE {result = Koona::AST::NBool.new(val[0])}
+
   expr : numeric
+       | bool
        | ident 
        | ident TLPAREN call_args TRPAREN {result = Koona::AST::NFunctionCall.new(val[0], val[2])}
        | expr binop expr {result = Koona::AST::NBinaryOperator.new(val[0], val[1], val[2])}

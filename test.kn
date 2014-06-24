@@ -11,4 +11,6 @@ if (x == 1)
   return x
 }
 
+x = true
+
 addVal((x), 2)

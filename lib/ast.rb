@@ -72,6 +72,13 @@ module Koona
       end
     end
 
+    class NBool < Node
+      def initialize(token)
+        @value = token.value
+      end
+      attr_accessor :value
+    end
+
     class NFunctionCall
       def initialize(id, arguments)
         @id = id

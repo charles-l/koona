@@ -96,6 +96,8 @@ module Koona
         expr.value.to_s
       when Koona::AST::NDouble
         expr.value.to_s
+      when Koona::AST::NBool
+        expr.value
       else
         raise CompileError, "need generate_expr handler for #{expr.class.name}"
       end

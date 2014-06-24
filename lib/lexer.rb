@@ -44,8 +44,14 @@ module Koona
           when (text = ss.scan(/if/))
             @rex_tokens.push action {[:TIF, Token.new(text, @filename, @lineno)]}
 
-          when (text = ss.scan(/else/))
+          when (text = ss.scan(/else/)) #TODO add support for if statements
             @rex_tokens.push action {[:TELSE, Token.new(text, @filename, @lineno)]}
+
+          when (text = ss.scan(/true/))
+            @rex_tokens.push action {[:TTRUE, Token.new(text, @filename, @lineno)]}
+
+          when (text = ss.scan(/false/))
+            @rex_tokens.push action {[:TFALSE, Token.new(text, @filename, @lineno)]}
 
           when (text = ss.scan(/[a-zA-Z_][a-zA-Z0-9_]*/))
             @rex_tokens.push action {[:TIDENTIFIER, Token.new(text, @filename, @lineno)]}
