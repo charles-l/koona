@@ -1,6 +1,7 @@
 int x=3
 x = x+1
 string myString = "this is a string"
+call printf("test")
 // this is a comment
 int addVal(int var, int val, bool do_add)
 {

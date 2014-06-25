@@ -14,6 +14,7 @@ At the moment, Koona will compile a simple syntax into valid C code. What's curr
 - Doubles
 - Booleans
 - Strings
+- FFI
 - Mathematic operations (+, -, \*, /)
 
 A valid `.kn` file:
@@ -21,7 +22,10 @@ A valid `.kn` file:
     int x=3
     x = x+1
     string myString = "this is a string"
-    // this is a comment
+
+    // Call an external C function:
+    call printf("test") 
+
     int addVal(int var, int val, bool do_add)
     {
       if(do_add)

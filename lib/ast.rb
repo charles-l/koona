@@ -111,6 +111,21 @@ module Koona
       end
     end
 
+    class NCFunctionCall
+      def initialize(id, arguments)
+        @id = id
+        @arguments = arguments
+      end
+
+      attr_accessor :id
+      attr_accessor :arguments
+
+      # Debug
+      def to_s
+        "#{@id}(#{@arguments})"
+      end
+    end
+
     class NFunctionDeclaration < Node
       def initialize(type, id, arguments, block, token)
         super token

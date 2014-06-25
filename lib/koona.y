@@ -1,5 +1,5 @@
 class Koona::Parser
-  token TIDENTIFIER TDOUBLE TINTEGER TSTRING
+  token TIDENTIFIER TDOUBLE TINTEGER TSTRING TCALL
   token TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
   token TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
   token TPLUS TMINUS TMUL TDIV
@@ -10,7 +10,7 @@ class Koona::Parser
   rule
   program : stmts {result = Koona::AST::NBlock.new(Koona::AST::NStatementList.new); result.statementlist.statements << val[0]}
   stmts : stmt {result = Koona::AST::NStatementList.new; result.statements << val[0]}
-  | stmts stmt {val[0].statements << val[1]}
+        | stmts stmt {val[0].statements << val[1]}
 
   stmt : return_stmt
        | expr
@@ -52,9 +52,12 @@ class Koona::Parser
        | string
        | bool
        | ident 
-       | ident TLPAREN call_args TRPAREN {result = Koona::AST::NFunctionCall.new(val[0], val[2])}
+       | func_call
        | expr binop expr {result = Koona::AST::NBinaryOperator.new(val[0], val[1], val[2])}
-       | TLPAREN expr TRPAREN {result = val[1]} # Check this later. Might be causing bugs.
+       | TLPAREN expr TRPAREN {result = val[1]}
+
+  func_call : ident TLPAREN call_args TRPAREN {result = Koona::AST::NFunctionCall.new(val[0], val[2])}
+            | TCALL ident TLPAREN call_args TRPAREN {result = Koona::AST::NCFunctionCall.new(val[1], val[3])}
 
   call_args : {result = Koona::AST::VariableList.new}
             | expr {result = Koona::AST::VariableList.new; result.variables << val[0]}

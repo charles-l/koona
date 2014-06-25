@@ -25,6 +25,7 @@ module Koona
       @output = @function_output + @output
       # Put include stuff at the top
       @output = "#include <stdbool.h>\n" + @output
+      @output = "#include <stdio.h>\n" + @output
     end
 
     def find_symbol(name)
@@ -75,6 +76,8 @@ module Koona
         generate_var_assignment(stmt)
       when Koona::AST::NFunctionCall
         generate_func_call(stmt)
+      when Koona::AST::NCFunctionCall
+        generate_c_func_call(stmt)
       when Koona::AST::NFunctionDeclaration
         # TODO. Do this differently if you can think of an idea.
         @function_output += generate_func_decl(stmt) # Send function declarations to @function_output
@@ -214,6 +217,14 @@ module Koona
         message = "function '#{stmt.id.name}' has not been defined in scope!"
         raise CompileError.new(message)
       end
+      r += "#{stmt.id.name}("
+      r += generate_var_list(stmt.arguments)
+      r += ");\n"
+      r
+    end
+
+    def generate_c_func_call(stmt)
+      r = ""
       r += "#{stmt.id.name}("
       r += generate_var_list(stmt.arguments)
       r += ");\n"
