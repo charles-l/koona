@@ -84,6 +84,18 @@ module Koona
       attr_accessor :value
     end
 
+    class NString < Node
+      def initialize(token)
+        @value = token.value
+      end
+
+      def to_s
+        return @value
+      end
+      
+      attr_accessor :value
+    end
+
     class NFunctionCall
       def initialize(id, arguments)
         @id = id
@@ -153,6 +165,21 @@ module Koona
       end
     end
 
+    class NVariableAssignment < Node
+      def initialize(id, expr, token)
+        super token
+        @id = id
+        @expr = expr
+      end
+      attr_accessor :id
+      attr_accessor :expr
+
+      # Debug
+      def to_s
+        "#{@id} = #{@expr}\n"
+      end
+    end
+
     class NReturn < Node
       def initialize(expr, token)
         super token
@@ -171,21 +198,6 @@ module Koona
         @block = block
       end
       attr_accessor :expr, :block
-    end
-
-    class NVariableAssignment < Node
-      def initialize(id, expr, token)
-        super token
-        @id = id
-        @expr = expr
-      end
-      attr_accessor :id
-      attr_accessor :expr
-
-      # Debug
-      def to_s
-        "#{@id} = #{@expr}\n"
-      end
     end
 
     class VariableList

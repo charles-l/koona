@@ -100,6 +100,8 @@ module Koona
         expr.value.to_s
       when Koona::AST::NBool
         expr.value
+      when Koona::AST::NString
+        expr.value
       else
         raise CompileError, "need generate_expr handler for #{expr.class.name}"
       end
@@ -121,6 +123,11 @@ module Koona
         message = "#{stmt.id.name} is already defined in scope as a #{v[:type]} at line #{v[:lineno]}"
         raise CompileError.new(message, :node=>stmt)
       end
+
+      if stmt.type.name == "string" then
+        stmt.type.name = "char *"
+      end
+
       r += "#{stmt.type} #{stmt.id}"
       if !stmt.expr.nil?
         r += " = "
@@ -167,6 +174,9 @@ module Koona
         raise CompileError.new(message, :node=>stmt)
       end
       push_scope
+      if stmt.type.name == "string" then
+        stmt.type.name = "char *"
+      end
       r += "#{stmt.type.name} #{stmt.id.name}("
       r += generate_var_list(stmt.arguments)
       r += ")\n"
@@ -181,7 +191,21 @@ module Koona
     end
     
     def generate_var_list(stmt)
-      "#{stmt.variables.join(", ")}"
+      r = ""
+      stmt.variables.each_with_index do |v, i|
+        if v.class == Koona::AST::FunctionVar
+          if v.type.name == "string"
+            v.type.name = "char *"
+          end
+          r += "#{v.type.name} #{v.id.name}"
+          if i < stmt.variables.length - 1
+            r += ", "
+          end
+        else
+          return "#{stmt.variables.join(", ")}"
+        end
+      end
+      r
     end
 
     def generate_func_call(stmt)

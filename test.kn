@@ -1,5 +1,6 @@
 int x=3
 x = x+1
+string myString = "this is a string"
 // this is a comment
 int addVal(int var, int val, bool do_add)
 {
@@ -8,4 +9,4 @@ int addVal(int var, int val, bool do_add)
     return (var + val)
   }
 }
-addVal((x), 2, true)
+addVal(x, 2, true)

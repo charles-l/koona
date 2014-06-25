@@ -1,5 +1,5 @@
 class Koona::Parser
-  token TIDENTIFIER TDOUBLE TINTEGER
+  token TIDENTIFIER TDOUBLE TINTEGER TSTRING
   token TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
   token TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
   token TPLUS TMINUS TMUL TDIV
@@ -43,10 +43,13 @@ class Koona::Parser
   numeric : TINTEGER {result = Koona::AST::NInteger.new(val[0])}
           | TDOUBLE {result = Koona::AST::NFloat.new(val[0])}
 
+  string : TSTRING {result = Koona::AST::NString.new(val[0])}
+
   bool : TTRUE {result = Koona::AST::NBool.new(val[0])}
        | TFALSE {result = Koona::AST::NBool.new(val[0])}
 
   expr : numeric
+       | string
        | bool
        | ident 
        | ident TLPAREN call_args TRPAREN {result = Koona::AST::NFunctionCall.new(val[0], val[2])}

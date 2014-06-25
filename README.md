@@ -13,12 +13,14 @@ At the moment, Koona will compile a simple syntax into valid C code. What's curr
 - Integers
 - Doubles
 - Booleans
+- Strings
 - Mathematic operations (+, -, \*, /)
 
 A valid `.kn` file:
 
     int x=3
     x = x+1
+    string myString = "this is a string"
     // this is a comment
     int addVal(int var, int val, bool do_add)
     {
@@ -27,12 +29,9 @@ A valid `.kn` file:
         return (var + val)
       }
     }
-    addVal((x), 2, true)
+    addVal(x, 2, true)
 
 ## Use
 To compile a `.kn` file, run: `bin/koona compile *file.kn*`. A C file will be generated (which you can then edit, or compile).
 
 If you want to compile straight to an executible, you can use the `--clang` flag to compile the `.c` file with clang.
-
-## Known bugs
-- You have to wrap variables in parenthesise when using in a function call (dunno why, but it's a bug with the parser somewhere)
