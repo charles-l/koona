@@ -18,12 +18,14 @@ module Koona
       @scope_depth = 0
       @scope = {}
       @scope_stack = []
+      @require_output = ""
 
       @output += "int main()\n{\n"
       @output += generate_block ast
       @output += "return 0;\n}\n"
       @output = @function_output + @output
       # Put include stuff at the top
+      @output = @require_output + @output
       @output = "#include <stdbool.h>\n" + @output
       @output = "#include <stdio.h>\n" + @output
     end
@@ -78,6 +80,10 @@ module Koona
         generate_func_call(stmt)
       when Koona::AST::NCFunctionCall
         generate_c_func_call(stmt)
+      when Koona::AST::NRequire
+        # TODO. Do this differently if you can think of an idea.
+        @require_output += generate_require(stmt)
+        ""
       when Koona::AST::NFunctionDeclaration
         # TODO. Do this differently if you can think of an idea.
         @function_output += generate_func_decl(stmt) # Send function declarations to @function_output
@@ -108,6 +114,13 @@ module Koona
       else
         raise CompileError, "need generate_expr handler for #{expr.class.name}"
       end
+    end
+
+    def generate_require(stmt)
+      if stmt.file.value.gsub("\"", "") =~ /.*\.[ch]/
+        return "#include <" + stmt.file.value.gsub("\"", "") + ">\n"
+      end
+      raise CompileError.new("Error on: #{stmt.to_s}. Can only include C or C header files.", :node=>stmt)
     end
 
     def generate_if(stmt)

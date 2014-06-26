@@ -41,6 +41,9 @@ module Koona
           when (text = ss.scan(/return/))
             @rex_tokens.push action {[:TRETURN, Token.new(text, @filename, @lineno)]}
 
+          when (text = ss.scan(/require/))
+            @rex_tokens.push action {[:TREQUIRE, Token.new(text, @filename, @lineno)]}
+
           when (text = ss.scan(/call/))
             @rex_tokens.push action {[:TCALL, Token.new(text, @filename, @lineno)]}
 

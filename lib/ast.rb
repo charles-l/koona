@@ -195,6 +195,18 @@ module Koona
       end
     end
 
+    class NRequire < Node
+      def initialize(file, token)
+        super token
+        @file = file
+      end
+      attr_accessor :file, :token
+      
+      def to_s
+        "require #{@file}"
+      end
+    end
+
     class NReturn < Node
       def initialize(expr, token)
         super token

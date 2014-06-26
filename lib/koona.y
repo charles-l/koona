@@ -3,7 +3,7 @@ class Koona::Parser
   token TCEQ TCNE TCLT TCLE TCGT TCGE TEQUAL
   token TLPAREN TRPAREN TLBRACE TRBRACE TCOMMA TDOT
   token TPLUS TMINUS TMUL TDIV
-  token TRETURN TIF TELSE
+  token TRETURN TREQUIRE TIF TELSE
   token TTRUE TFALSE
 
   start program
@@ -19,6 +19,7 @@ class Koona::Parser
        | var_decl
        | var_assign
        | if_stmt
+       | require_stmt
 
   block : TLBRACE TRBRACE {result = Koona::AST::NBlock.new}
         | TLBRACE stmts TRBRACE {result = Koona::AST::NBlock.new(Koona::AST::NStatementList.new); result.statementlist.statements << val[1]}
@@ -35,6 +36,9 @@ class Koona::Parser
   func_decl_args : {result = Koona::AST::VariableList.new}
                  | ident ident {result = Koona::AST::VariableList.new; result.variables << Koona::AST::FunctionVar.new(val[0], val[1])}
                  | func_decl_args TCOMMA ident ident {val[0].variables << Koona::AST::FunctionVar.new(val[2], val[3])}
+
+  require_stmt : TREQUIRE string {result = Koona::AST::NRequire.new(val[1], val[0])}
+
   return_stmt : TRETURN {result = Koona::AST::NReturn.new(nil, val[0])}
               | TRETURN expr {result = Koona::AST::NReturn.new(val[1], val[0])}
 

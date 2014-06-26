@@ -1,0 +1,4 @@
+int print(string s)
+{
+  call printf(s)
+}
