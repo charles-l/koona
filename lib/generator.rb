@@ -245,6 +245,9 @@ module Koona
     end
     
     def generate_return(stmt)
+      if @scope_depth == 0
+        raise CompileError.new("return statement should be inside of a function declaration.")
+      end
       r = ""
       r += "return "
       if !stmt.expr.nil?
