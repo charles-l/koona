@@ -5,7 +5,8 @@
 
 #define DEBUG
 
-// we can store 512 objects on our GC's heap
+// heap size is small for testing
+// if you don't want constant gcing, set it to something larger
 #define HEAP_SIZE 5
 
 // maximum of 32 locals in a scope
