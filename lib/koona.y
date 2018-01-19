@@ -14,7 +14,7 @@ class Koona::Parser
 
   stmt : return_stmt
        | expr
-       | block 
+       | block
        | func_decl
        | var_decl
        | var_assign
@@ -30,7 +30,7 @@ class Koona::Parser
 
   if_stmt : TIF TLPAREN expr TRPAREN block {result = Koona::AST::NIf.new(val[2], val[4], val[0])}
 
-  func_decl : ident ident TLPAREN func_decl_args TRPAREN block 
+  func_decl : ident ident TLPAREN func_decl_args TRPAREN block
             {result = Koona::AST::NFunctionDeclaration.new(val[0], val[1], val[3], val[5], val[2])}
 
   func_decl_args : {result = Koona::AST::VariableList.new}
@@ -55,7 +55,7 @@ class Koona::Parser
   expr : numeric
        | string
        | bool
-       | ident 
+       | ident
        | func_call
        | expr binop expr {result = Koona::AST::NBinaryOperator.new(val[0], val[1], val[2])}
        | TLPAREN expr TRPAREN {result = val[1]}
@@ -67,13 +67,13 @@ class Koona::Parser
             | expr {result = Koona::AST::VariableList.new; result.variables << val[0]}
             | call_args TCOMMA expr {val[0].variables << val[2]}
 
-  binop : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE 
+  binop : TCEQ | TCNE | TCLT | TCLE | TCGT | TCGE
              | TPLUS | TMINUS | TMUL | TDIV
 end
 
 ---- header
-  require './lib/lexer'
-  require './lib/ast'
+  require_relative './lexer'
+  require_relative './ast'
 
 
 ---- inner

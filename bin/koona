@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require './lib/compiler.rb'
+require_relative "../lib/compiler.rb"
 require 'thor'
 
 class KoonaCLI < Thor

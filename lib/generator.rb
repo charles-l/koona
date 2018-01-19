@@ -41,7 +41,7 @@ module Koona
       @output = @function_output + @output
       # Put include stuff at the top
       @output = @require_output + @output
-      @output = "#include \"lib/base/runtime.c\"\n" + @output
+      @output = "#include \"#{File.dirname(__FILE__)}/base/runtime.c\"\n" + @output
       @output = "#include <stdbool.h>\n" + @output
     end
 

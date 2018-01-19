@@ -1,5 +1,5 @@
-require './lib/parser.rb'
-require './lib/generator.rb'
+require_relative './parser.rb'
+require_relative './generator.rb'
 
 module Koona
   class Compiler
