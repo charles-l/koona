@@ -1,4 +1,12 @@
+# TODO: split out semantic analysis pass
+# TODO: add proper type check/inferance pass
 module Koona
+  OP_FUNCS = {
+    "+" => "_op_do_add",
+    "-" => "_op_do_sub",
+    "*" => "_op_do_mul",
+    "/" => "_op_do_div"
+  }
   class CompileError < Exception
     def initialize(message, options={})
       message = "#{options[:node].filename}:#{options[:node].lineno} #{message}" if options[:node]
@@ -10,6 +18,12 @@ module Koona
   class Generator
     def initialize
       @self = nil
+      @tmp_counter = 0
+    end
+
+    def gentmp
+      @tmp_counter += 1
+      "_tmp#{@tmp_counter}"
     end
 
     def generate(ast)
@@ -21,23 +35,31 @@ module Koona
       @require_output = ""
 
       @output += "int main()\n{\n"
+      @output += "kstack_frame_t *koona_stack = &koona_stack_root;\n"
       @output += generate_block ast
       @output += "return 0;\n}\n"
       @output = @function_output + @output
       # Put include stuff at the top
       @output = @require_output + @output
+      @output = "#include \"lib/base/runtime.c\"\n" + @output
       @output = "#include <stdbool.h>\n" + @output
-      @output = "#include <stdio.h>\n" + @output
+    end
+
+    def insert_symbol!(name, type)
+      @scope[name] = {type: type, index: @scope.size}
+      @scope[name]
     end
 
     def find_symbol(name)
       if !@scope[name].nil?
         @scope[name]
+      else
+        raise CompileError, "Failed to find symbol #{name}"
       end
     end
 
     def symbol_exists?(symbol)
-      !find_symbol(symbol).nil?
+      return @scope.key?(symbol)
     end
 
     def push_scope
@@ -75,7 +97,13 @@ module Koona
       when Koona::AST::NVariableDeclaration
         generate_var_decl(stmt)
       when Koona::AST::NVariableAssignment
-        generate_var_assignment(stmt)
+        if stmt.expr.class == AST::NFunctionCall
+          r, t = generate_func_call(stmt.expr)
+          stmt.expr = t
+          r + generate_var_assignment(stmt)
+        else
+          generate_var_assignment(stmt)
+        end
       when Koona::AST::NFunctionCall
         generate_func_call(stmt)
       when Koona::AST::NCFunctionCall
@@ -92,25 +120,44 @@ module Koona
         generate_return(stmt)
       when Koona::AST::NIf
         generate_if(stmt)
+      when String # arbitrary inline code
+        stmt
       else
-        raise CompileError, "need generate_stmt handler for #{stmt.class.name}"
+        raise CompileError, "need generate_stmt handler for #{stmt.class}"
+      end
+    end
+
+    def id_or_generate(expr)
+      if expr.class == Koona::AST::NIdentifier
+        v = find_symbol(expr.name)
+        "koona_stack->cells[/* #{expr.name} */ #{v[:index]}]"
+      else
+        generate_expr(expr)
       end
     end
 
     def generate_expr(expr)
       case expr
       when Koona::AST::NIdentifier
-        expr.name
+        s = find_symbol(expr.name)
+        "unbox_#{s[:type]}(koona_stack->cells[/* #{expr.name} */ #{s[:index]}])"
+      when Koona::AST::NFunctionCall
+        generate_func_call(expr)
       when Koona::AST::NBinaryOperator
-        "#{generate_expr expr.lhs} #{expr.op.value} #{generate_expr expr.rhs}"
+        a = id_or_generate(expr.lhs)
+        b = id_or_generate(expr.rhs)
+        "#{OP_FUNCS[expr.op.value]}(#{a}, #{b})"
       when Koona::AST::NInteger
-        expr.value.to_s
+        "make_int(" + expr.value.to_s + ")"
       when Koona::AST::NDouble
+        raise CompileError, "doubles aren't supported right now"
         expr.value.to_s
       when Koona::AST::NBool
-        expr.value
+        "make_bool(" + expr.value + ")"
       when Koona::AST::NString
-        expr.value
+        "make_string(" + expr.value + ")"
+      when String
+        expr
       else
         raise CompileError, "need generate_expr handler for #{expr.class.name}"
       end
@@ -133,30 +180,16 @@ module Koona
     end
 
     def generate_var_decl(stmt)
-      r = ""
       if symbol_exists?(stmt.id.name)
         v = find_symbol(stmt.id.name)
         message = "#{stmt.id.name} is already defined in scope as a #{v[:type]} at line #{v[:lineno]}"
-        raise CompileError.new(message, :node=>stmt)
+        raise CompileError.new message, node: stmt
       end
 
-      if stmt.type.name == "string" then
-        stmt.type.name = "char *"
-      end
-
-      r += "#{stmt.type} #{stmt.id}"
-      if !stmt.expr.nil?
-        r += " = "
-        r += generate_expr stmt.expr
-      end
-      r+= ";\n"
-
-      @scope[stmt.id.name] = {
-        :type => stmt.type.name,
-        :lineno => stmt.lineno.to_i
-      }
-
-      r
+      v = insert_symbol!(stmt.id.name, stmt.type.name)
+      r = ""
+      r += "koona_stack->n++; // make room for #{stmt.id.name}\n"
+      r + generate_var_assignment(stmt)
     end
 
     def generate_stmt_list(stmt)
@@ -176,12 +209,18 @@ module Koona
       if stmt.expr.nil?
         raise CompilerError.new("Missing assignment expression!", :node=>stmt)
       end
-      r += "#{stmt.id} = "
+
+      v = find_symbol(stmt.id.name)
+      r += "koona_stack->cells[/* #{stmt.id.name} */ #{v[:index]}]"
+      if stmt.expr.nil?
+        raise CompileError, "Need value for variable", node: stmt
+      end
+      r += " = "
       r += generate_expr stmt.expr
-      r += ";\n"
+      r+= ";\n"
       r
     end
-    
+
     def generate_func_decl(stmt)
       r = ""
       if symbol_exists?(stmt.id.name)
@@ -190,38 +229,24 @@ module Koona
         raise CompileError.new(message, :node=>stmt)
       end
       push_scope
-      if stmt.type.name == "string" then
-        stmt.type.name = "char *"
+
+      # insert the arguments
+      stmt.arguments.variables.each do |var|
+        insert_symbol! var.id.name, var.type.name
       end
-      r += "#{stmt.type.name} #{stmt.id.name}("
-      r += generate_var_list(stmt.arguments)
-      r += ")\n"
+
+      r += "kobj_t *#{stmt.id.name}(kstack_frame_t *koona_stack)\n"
       r += generate_block(stmt.block)
       pop_scope
 
-      @scope[stmt.id.name] = {
-        :kind => "function",
-        :lineno => stmt.lineno
-      }
+      insert_symbol! stmt.id.name, "function"
       r
     end
-    
-    def generate_var_list(stmt)
-      r = ""
-      stmt.variables.each_with_index do |v, i|
-        if v.class == Koona::AST::FunctionVar
-          if v.type.name == "string"
-            v.type.name = "char *"
-          end
-          r += "#{v.type.name} #{v.id.name}"
-          if i < stmt.variables.length - 1
-            r += ", "
-          end
-        else
-          return "#{stmt.variables.join(", ")}"
-        end
-      end
-      r
+
+    def generate_call_list(stmt, frame)
+      stmt.variables.map do |e|
+        "#{frame}.cells[#{frame}.n] = #{id_or_generate e}; #{frame}.n++;\n"
+      end.join
     end
 
     def generate_func_call(stmt)
@@ -230,20 +255,34 @@ module Koona
         message = "function '#{stmt.id.name}' has not been defined in scope!"
         raise CompileError.new(message)
       end
-      r += "#{stmt.id.name}("
-      r += generate_var_list(stmt.arguments)
-      r += ");\n"
-      r
+      ret = gentmp
+      r += "// begin function call {\n"
+      callee_frame = gentmp
+      r = "kstack_frame_t #{callee_frame} = {0, {}, koona_stack, NULL};\n"
+      r += "koona_stack->next = &#{callee_frame};\n"
+      r += generate_call_list(stmt.arguments, callee_frame)
+      r += "kobj_t *#{ret} = #{stmt.id.name}(&#{callee_frame});\n"
+      r += "free_call_frame(&#{callee_frame});\n"
+      r += "koona_stack->next = NULL;\n"
+      r += "// } end function call\n"
+      return r, ret
     end
 
     def generate_c_func_call(stmt)
       r = ""
       r += "#{stmt.id.name}("
-      r += generate_var_list(stmt.arguments)
+      r += stmt.arguments.variables.map do |e|
+        if e.class == Koona::AST::NIdentifier
+          s = find_symbol(e.name)
+          "unbox_#{s[:type]}(koona_stack->cells[#{s[:index]}])"
+        else
+          e
+        end
+      end.join(", ")
       r += ");\n"
       r
     end
-    
+
     def generate_return(stmt)
       if @scope_depth == 0
         raise CompileError.new("return statement should be inside of a function declaration.")

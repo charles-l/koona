@@ -1,13 +1,19 @@
+// this is a comment
 int x=3
 x = x+1
 string myString = "this is a string"
-call printf("test")
-// this is a comment
+call printf("test\n")
+
 int addVal(int var, int val, bool do_add)
 {
+    call printf(">>%d\n", do_add)
   if(do_add)
   {
     return (var + val)
   }
 }
-addVal(x, 2, true)
+
+
+x = addVal(x, 2, true)
+
+call printf("%d\n", x)
