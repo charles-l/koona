@@ -88,12 +88,6 @@ kstack_frame_t make_call_frame(kstack_frame_t *caller, kobj_t *args, ...) {
     return f;
 }
 
-void free_call_frame(kstack_frame_t *f) {
-    for(int i = 0; i < f->n; i++) {
-        khfree(f->cells[i]);
-    }
-}
-
 void mark(kobj_t *f) {
     if(f->mark)
         return;

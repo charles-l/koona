@@ -14,6 +14,7 @@ int addVal(int var, int val, bool do_add)
 }
 
 
-x = addVal(x, 2, true)
+int y = addVal(x, 2, true)
 
+call printf("%d\n", y)
 call printf("%d\n", x)

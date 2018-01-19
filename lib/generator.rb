@@ -90,22 +90,45 @@ module Koona
       r
     end
 
+    def transform_fcall_assign(stmt)
+      r, t = generate_func_call(stmt.expr)
+      stmt.expr = t
+      r + generate_var_assignment(stmt)
+    end
+
     def generate_stmt(stmt)
       case stmt
       when Koona::AST::NStatementList
         generate_stmt_list(stmt)
       when Koona::AST::NVariableDeclaration
-        generate_var_decl(stmt)
+        if symbol_exists?(stmt.id.name)
+          v = find_symbol(stmt.id.name)
+          message = "#{stmt.id.name} is already defined in scope as a #{v[:type]} at line #{v[:lineno]}"
+          raise CompileError.new message, node: stmt
+        end
+
+        v = insert_symbol!(stmt.id.name, stmt.type.name)
+
+
+        r = ""
+
+        # now its defined, so reuse the assignment code
+        if stmt.expr.class == AST::NFunctionCall # HACK: this was faster, but combine with assignment code in a transform pass
+          r += transform_fcall_assign(stmt)
+        else
+          r += generate_var_assignment(stmt)
+        end
+
+        r + "koona_stack->n++; // track #{stmt.id.name}\n"
       when Koona::AST::NVariableAssignment
         if stmt.expr.class == AST::NFunctionCall
-          r, t = generate_func_call(stmt.expr)
-          stmt.expr = t
-          r + generate_var_assignment(stmt)
+          transform_fcall_assign(stmt.expr)
         else
           generate_var_assignment(stmt)
         end
       when Koona::AST::NFunctionCall
-        generate_func_call(stmt)
+        r, _ = generate_func_call(stmt)
+        r
       when Koona::AST::NCFunctionCall
         generate_c_func_call(stmt)
       when Koona::AST::NRequire
@@ -141,8 +164,6 @@ module Koona
       when Koona::AST::NIdentifier
         s = find_symbol(expr.name)
         "unbox_#{s[:type]}(koona_stack->cells[/* #{expr.name} */ #{s[:index]}])"
-      when Koona::AST::NFunctionCall
-        generate_func_call(expr)
       when Koona::AST::NBinaryOperator
         a = id_or_generate(expr.lhs)
         b = id_or_generate(expr.rhs)
@@ -179,19 +200,6 @@ module Koona
       r
     end
 
-    def generate_var_decl(stmt)
-      if symbol_exists?(stmt.id.name)
-        v = find_symbol(stmt.id.name)
-        message = "#{stmt.id.name} is already defined in scope as a #{v[:type]} at line #{v[:lineno]}"
-        raise CompileError.new message, node: stmt
-      end
-
-      v = insert_symbol!(stmt.id.name, stmt.type.name)
-      r = ""
-      r += "koona_stack->n++; // make room for #{stmt.id.name}\n"
-      r + generate_var_assignment(stmt)
-    end
-
     def generate_stmt_list(stmt)
       r = ""
       stmt.statements.each do |s|
@@ -217,7 +225,7 @@ module Koona
       end
       r += " = "
       r += generate_expr stmt.expr
-      r+= ";\n"
+      r += ";\n"
       r
     end
 
@@ -262,7 +270,6 @@ module Koona
       r += "koona_stack->next = &#{callee_frame};\n"
       r += generate_call_list(stmt.arguments, callee_frame)
       r += "kobj_t *#{ret} = #{stmt.id.name}(&#{callee_frame});\n"
-      r += "free_call_frame(&#{callee_frame});\n"
       r += "koona_stack->next = NULL;\n"
       r += "// } end function call\n"
       return r, ret
