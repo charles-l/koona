@@ -1,7 +1,7 @@
 # Koona
-### A *really* simple programming language
+### A *really* simple compiler
 
-Koona is a simple programing language I'm writing to learn about compiler design. It's written in Ruby, but I'll eventually port it to more permanent C++ code. However, this repository will stick around as an example of a simple compiler.
+Koona is a simple compiler I wrote a few years ago to learn about compiler design. It's over-engineered and poorly written (since I was still quite a noob when I initially wrote it), so forgive code quality in the parsing/lexing/code generation. If I get some free time, I'll clean it up and make it easier to understand.
 
 ## What it does
 At the moment, Koona will compile a simple syntax into valid C code. What's currently supported:
@@ -14,6 +14,7 @@ At the moment, Koona will compile a simple syntax into valid C code. What's curr
 - Doubles
 - Booleans
 - Strings
+- Garbage collection
 - FFI
 - Mathematic operations (+, -, \*, /)
 
@@ -24,7 +25,7 @@ A valid `.kn` file:
     string myString = "this is a string"
 
     // Call an external C function:
-    call printf("test") 
+    call printf("test")
 
     int addVal(int var, int val, bool do_add)
     {
